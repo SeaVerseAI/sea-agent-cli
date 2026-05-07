@@ -24,7 +24,9 @@ export function chatCommand(): Command {
         stream: options.stream,
       };
       if (options.stream) {
-        process.stdout.write(await client.postText("/v1/chat/completions", payload));
+        const renderer = createChatStreamRenderer();
+        await client.postStream("/v1/chat/completions", payload, renderer.write);
+        renderer.end();
         return;
       }
       printJSON(await client.post("/v1/chat/completions", payload));
@@ -49,4 +51,92 @@ export function chatCommand(): Command {
   });
 
   return cmd;
+}
+
+function createChatStreamRenderer(): { write: (chunk: string) => void; end: () => void } {
+  let buffer = "";
+  let wroteText = false;
+  return {
+    write(chunk: string): void {
+      buffer += chunk;
+      const parts = buffer.split(/\r?\n\r?\n/);
+      buffer = parts.pop() ?? "";
+      for (const part of parts) {
+        if (renderChatStreamBlock(part)) {
+          wroteText = true;
+        }
+      }
+    },
+    end(): void {
+      if (buffer.trim() && renderChatStreamBlock(buffer)) {
+        wroteText = true;
+      }
+      if (wroteText) {
+        process.stdout.write("\n");
+      }
+    },
+  };
+}
+
+function renderChatStreamBlock(block: string): boolean {
+  let wroteText = false;
+  for (const event of parseSSE(block)) {
+    const chunk = textFromSSEEvent(event);
+    if (chunk) {
+      process.stdout.write(chunk);
+      wroteText = true;
+    }
+  }
+  return wroteText;
+}
+
+type SSEEvent = {
+  event: string;
+  data: unknown;
+};
+
+function parseSSE(text: string): SSEEvent[] {
+  const events: SSEEvent[] = [];
+  for (const block of text.split(/\r?\n\r?\n+/)) {
+    const lines = block.split(/\r?\n/);
+    let event = "message";
+    const dataLines: string[] = [];
+    for (const line of lines) {
+      if (line.startsWith("event:")) {
+        event = line.slice("event:".length).trim();
+      } else if (line.startsWith("data:")) {
+        dataLines.push(line.slice("data:".length).trimStart());
+      }
+    }
+    if (dataLines.length === 0) {
+      continue;
+    }
+    const dataText = dataLines.join("\n");
+    let data: unknown = dataText;
+    try {
+      data = JSON.parse(dataText);
+    } catch {
+      // Keep non-JSON data as raw text.
+    }
+    events.push({ event, data });
+  }
+  return events;
+}
+
+function textFromSSEEvent(event: SSEEvent): string {
+  if (event.event === "response.text.delta" || event.event === "response.output_text.delta") {
+    return stringField(event.data, "delta");
+  }
+  if (event.event === "chat.response" || event.event === "message.delta") {
+    return stringField(event.data, "content") || stringField(event.data, "text") || stringField(event.data, "delta");
+  }
+  return "";
+}
+
+function stringField(data: unknown, field: string): string {
+  if (!data || typeof data !== "object") {
+    return "";
+  }
+  const value = (data as Record<string, unknown>)[field];
+  return typeof value === "string" ? value : "";
 }

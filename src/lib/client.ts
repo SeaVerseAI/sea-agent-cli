@@ -28,6 +28,10 @@ export class AgentGatewayClient {
     return this.requestText("POST", this.buildURL(path), body);
   }
 
+  async postStream(path: string, body: unknown, onChunk: (chunk: string) => void): Promise<void> {
+    await this.requestStream("POST", this.buildURL(path), body, onChunk);
+  }
+
   async put(path: string, body?: unknown): Promise<unknown> {
     return this.requestJSON("PUT", this.buildURL(path), body);
   }
@@ -52,6 +56,42 @@ export class AgentGatewayClient {
   }
 
   private async requestText(method: Dispatcher.HttpMethod, url: string, body?: unknown, accept = "*/*"): Promise<string> {
+    const { headers, payload } = this.buildRequest(method, url, body, accept);
+    const response = await request(url, {
+      method,
+      headers,
+      body: payload,
+    });
+    const text = await response.body.text();
+    if (response.statusCode >= 400) {
+      throw new Error(`${response.statusCode}: ${errorMessageFromResponse(text)}`);
+    }
+    return text;
+  }
+
+  private async requestStream(method: Dispatcher.HttpMethod, url: string, body: unknown, onChunk: (chunk: string) => void): Promise<void> {
+    const { headers, payload } = this.buildRequest(method, url, body, "text/event-stream");
+    const response = await request(url, {
+      method,
+      headers,
+      body: payload,
+    });
+    if (response.statusCode >= 400) {
+      const text = await response.body.text();
+      throw new Error(`${response.statusCode}: ${errorMessageFromResponse(text)}`);
+    }
+
+    const decoder = new TextDecoder();
+    for await (const chunk of response.body) {
+      onChunk(decoder.decode(chunk, { stream: true }));
+    }
+    const rest = decoder.decode();
+    if (rest) {
+      onChunk(rest);
+    }
+  }
+
+  private buildRequest(method: Dispatcher.HttpMethod, url: string, body: unknown, accept = "*/*"): { headers: Record<string, string>; payload?: string } {
     const headers: Record<string, string> = {
       accept,
     };
@@ -66,25 +106,18 @@ export class AgentGatewayClient {
     if (process.env.AGENTCTL_DEBUG === "1") {
       console.error(`${method} ${url}`);
     }
-
-    const response = await request(url, {
-      method,
-      headers,
-      body: payload,
-    });
-    const text = await response.body.text();
-    if (response.statusCode >= 400) {
-      let parsed: unknown;
-      try {
-        parsed = text ? JSON.parse(text) : {};
-      } catch {
-        parsed = {};
-      }
-      const message = typeof parsed === "object" && parsed && "error" in parsed ? (parsed as any).error : text;
-      throw new Error(`${response.statusCode}: ${message}`);
-    }
-    return text;
+    return { headers, payload };
   }
+}
+
+function errorMessageFromResponse(text: string): string {
+  let parsed: unknown;
+  try {
+    parsed = text ? JSON.parse(text) : {};
+  } catch {
+    parsed = {};
+  }
+  return typeof parsed === "object" && parsed && "error" in parsed ? String((parsed as any).error) : text;
 }
 
 function parseJSONResponse(text: string, url: string): unknown {
