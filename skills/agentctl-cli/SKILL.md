@@ -57,6 +57,8 @@ AGENTCTL_DEBUG=1 node dist/index.js ...
 
 Registration and creation commands read JSON or YAML payloads with `-f/--file`. JSON is parsed for every path except `.yaml` and `.yml`, which are parsed as YAML.
 
+When creating or modifying payloads for `tool register`, `tool create`, `skill register`, `agent register`, or `agent create`, read [Capability Formats](references/capability-formats.md). It captures the current `agent-gateway` request structs, defaults, validation rules, and examples for Tool, Skill, and Agent definitions.
+
 Use the repo examples as schemas and starting points:
 
 - `examples/tool-web-fetch.json`: tool registration payload
@@ -135,6 +137,15 @@ Run with inline runtime config:
 ```bash
 node dist/index.js chat run --agent-config-file examples/runtime-agent-config.json "Fetch https://example.com"
 ```
+
+Generate a new capability payload:
+
+1. Read [Capability Formats](references/capability-formats.md).
+2. Choose the endpoint shape:
+   - Prefer `register` commands for concise Tool, Skill, and Agent setup.
+   - Use `create` commands when the user needs the lower-level registry shape with explicit metadata, status, version lifecycle, or immutable version payloads.
+3. Write the payload as task-specific JSON/YAML.
+4. Build, register/create, then verify with `list`, `get`, `resolve`, or `capabilities`.
 
 ## Gateway API Mapping
 
