@@ -64,6 +64,17 @@ Use the repo examples as starting points:
 
 Create task-specific payload files instead of editing shared examples unless the user asks to change examples.
 
+For media-generation agents, also check the existing SeaArt tool registry before creating new capabilities:
+
+```bash
+seaagent tool list --search image --status active
+seaagent tool list --search video --status active
+seaagent tool list --search task --status active
+seaagent skill list --search media --status active
+```
+
+Prefer reusing active tools such as `seaart:generate_image:v1`, `seaart:generate_video:v1`, `seaart:get_task_status:v1`, `seaart:list_models:v1`, and `seaart:get_model_skill:v1` when present. In skill manifests, use the full active `tool_key` for builtin SeaArt refs unless there is a confirmed reason to use the shorter runtime alias.
+
 ## Commands
 
 System:
@@ -134,6 +145,39 @@ seaagent chat stream <chat-id> [--after-seq <n>]
 seaagent chat stream --ws <chat-id> [--after-seq <n>]
 seaagent chat cancel <chat-id>
 ```
+
+## Agent Registration Workflow
+
+For gateway mutations, use this order:
+
+1. Confirm `seaagent config get` points at the intended endpoint.
+2. Check for an existing agent/skill with `list --search`.
+3. Register or update the required skill first, then register or update the agent.
+4. Verify with `seaagent agent capabilities <agent-id-or-key>`.
+5. Run a lightweight smoke test before invoking expensive tools:
+   ```bash
+   seaagent chat run --no-stream <agent-id-or-key> "请用一句话说明你能做什么，不要调用任何工具。"
+   ```
+
+On the current SeaArt gateway, agent `category` is constrained to `fabric` or `seaactor`. Use `fabric` for normal runnable assistants unless the user explicitly needs another category. A known-good model config for SeaArt media agents is:
+
+```json
+{
+  "default": "gpt-5.1-chat",
+  "allowed": ["gpt-5.1-chat", "gpt-4.1-mini", "gpt-4o"]
+}
+```
+
+If a newly registered agent times out even on the no-tool smoke test, update it with the low-level `agent update` shape and set `category: "fabric"` plus the model config above, then retest before debugging tools.
+
+## Chat Runtime Caveats
+
+Long media-generation requests can exceed the front proxy timeout and return `504 Gateway Time-out` even after agent registration succeeds. If that happens:
+
+- First confirm a no-tool smoke test completes; otherwise fix agent category/model config.
+- Try `chat run` streaming and `chat run --ws`, but note some deployed proxies may close SSE (`other side closed`) or reject WebSocket upgrades (`non-101 status`).
+- If no `run_id`, task id, or asset URL is returned, do not claim generation succeeded. Report the gateway timeout and keep the exact prompt/settings for retry or backend log inspection.
+- The CLI currently has no direct `tool invoke` command; tool execution goes through `chat run`.
 
 ## Gateway API Mapping
 

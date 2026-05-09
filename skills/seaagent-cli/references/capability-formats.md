@@ -266,6 +266,7 @@ Tool refs should match the gateway resolver:
 - Prefer the exact tool `runtime_id` from `seaagent tool resolve <tool-id>`.
 - Current resolver accepts exact `runtime_id` / `tool_key` and also `provider:name` as a compatibility lookup.
 - Builtin tools may intentionally use stable aliases such as `seaart:generate_image`.
+- For SeaArt builtin media tools, prefer the full active `tool_key` in skill manifests, for example `seaart:generate_image:v1`, `seaart:generate_video:v1`, `seaart:get_task_status:v1`, `seaart:list_models:v1`, and `seaart:get_model_skill:v1`. This matches existing working media-generation registrations and avoids ambiguity between runtime aliases and versioned tool records.
 
 ## Skill Low-Level Current State
 
@@ -327,10 +328,10 @@ seaagent agent register -f <payload.json>
   "version": "v1",
   "display_name": "Agent Name",
   "description": "What the agent does.",
-  "category": "agent",
+  "category": "fabric",
   "model": {
-    "default": "gpt-4o",
-    "allowed": ["gpt-4o"]
+    "default": "gpt-5.1-chat",
+    "allowed": ["gpt-5.1-chat", "gpt-4.1-mini", "gpt-4o"]
   },
   "system_prompt": "Base system prompt.",
   "skills": ["provider:skill_name:v1"],
@@ -351,6 +352,7 @@ seaagent agent register -f <payload.json>
 Rules:
 
 - `name`, `description`, `category`, `owner_id`, and `created_by` are required after defaults.
+- Current SeaArt gateway deployments may reject arbitrary categories; use `fabric` for standard runnable agents and `seaactor` only when that category is explicitly required.
 - `version` defaults to `v1`; `id` defaults to `name:version`; `display_name` defaults to `name`; `owner_id` defaults to `internal`.
 - `model`, `config`, and `permissions` default to `{}`.
 - `skills` must contain non-empty refs and every referenced skill must resolve to active Skill current state.
@@ -363,7 +365,7 @@ Use with `agent register` to create if the payload includes low-level trigger fi
 ```json
 {
   "agent_key": "agent_name:v1",
-  "category": "agent",
+  "category": "fabric",
   "display_name": "Agent Name",
   "name": "agent_name",
   "description": "What the agent does.",
@@ -371,8 +373,8 @@ Use with `agent register` to create if the payload includes low-level trigger fi
   "status": "active",
   "metadata": {},
   "model_config": {
-    "default": "gpt-4o",
-    "allowed": ["gpt-4o"]
+    "default": "gpt-5.1-chat",
+    "allowed": ["gpt-5.1-chat", "gpt-4.1-mini", "gpt-4o"]
   },
   "system_prompt": "Base system prompt.",
   "agent_config": {
@@ -390,6 +392,8 @@ Use with `agent register` to create if the payload includes low-level trigger fi
 ```
 
 Create requires `created_by`; update requires `updated_by`. Every skill ref must resolve to active Skill current state.
+
+Use the low-level update shape to fix runnable-agent issues after registration. If a no-tool chat smoke test returns a proxy timeout, first verify/update `category: "fabric"` and a known-good `model_config` before investigating tool behavior.
 
 ## Chat Payloads
 
@@ -422,6 +426,7 @@ seaagent tool resolve <tool-id-or-key>
 seaagent skill list --provider <provider> --status active
 seaagent agent list --search <agent_name>
 seaagent agent capabilities <agent-id-or-key>
+seaagent chat run --no-stream <agent-id-or-key> "请用一句话说明你能做什么，不要调用任何工具。"
 seaagent chat run <agent-id-or-key> "Test message"
 seaagent chat run --ws <agent-id-or-key> "Test message"
 ```
