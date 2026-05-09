@@ -1,6 +1,6 @@
 # Capability Formats
 
-These formats come from `~/Desktop/sea_art/agent-gateway` models and services. `agentctl` passes files through to the gateway; it does not reshape payloads beyond JSON/YAML parsing.
+These formats come from `~/Desktop/sea_art/agent-gateway` models and services. `seaagent` passes files through to the gateway; it does not reshape payloads beyond JSON/YAML parsing.
 
 ## Current API Shape
 
@@ -88,7 +88,7 @@ Do not put real secrets in payloads. For auth, use a reference such as:
 Use with:
 
 ```bash
-node dist/index.js tool register -f <payload.json>
+seaagent tool register -f <payload.json>
 ```
 
 Also usable with `tool update <id> -f file` if the payload does not include low-level trigger fields.
@@ -217,7 +217,7 @@ Create requires `created_by`; update requires `updated_by`. The OpenAI function 
 Use with:
 
 ```bash
-node dist/index.js skill register -f <payload.json>
+seaagent skill register -f <payload.json>
 ```
 
 Also usable with `skill update <id> -f file` if the payload does not include low-level trigger fields.
@@ -263,7 +263,7 @@ Rules:
 
 Tool refs should match the gateway resolver:
 
-- Prefer the exact tool `runtime_id` from `node dist/index.js tool resolve <tool-id>`.
+- Prefer the exact tool `runtime_id` from `seaagent tool resolve <tool-id>`.
 - Current resolver accepts exact `runtime_id` / `tool_key` and also `provider:name` as a compatibility lookup.
 - Builtin tools may intentionally use stable aliases such as `seaart:generate_image`.
 
@@ -317,7 +317,7 @@ Create requires `created_by`; update requires `updated_by`. `manifest.name` and 
 Use with:
 
 ```bash
-node dist/index.js agent register -f <payload.json>
+seaagent agent register -f <payload.json>
 ```
 
 ```json
@@ -417,11 +417,11 @@ Create requires `created_by`; update requires `updated_by`. Every skill ref must
 After mutations, verify with:
 
 ```bash
-node dist/index.js tool find --provider <provider> --status active
-node dist/index.js tool resolve <tool-id-or-key>
-node dist/index.js skill list --provider <provider> --status active
-node dist/index.js agent list --search <agent_name>
-node dist/index.js agent capabilities <agent-id-or-key>
-node dist/index.js chat run <agent-id-or-key> "Test message"
-node dist/index.js chat run --ws <agent-id-or-key> "Test message"
+seaagent tool find --provider <provider> --status active
+seaagent tool resolve <tool-id-or-key>
+seaagent skill list --provider <provider> --status active
+seaagent agent list --search <agent_name>
+seaagent agent capabilities <agent-id-or-key>
+seaagent chat run <agent-id-or-key> "Test message"
+seaagent chat run --ws <agent-id-or-key> "Test message"
 ```

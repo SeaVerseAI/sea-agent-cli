@@ -11,7 +11,7 @@ import { toolCommand } from "./commands/tool.js";
 const program = new Command();
 
 program
-  .name("agentctl")
+  .name("seaagent")
   .description("CLI for agent-gateway")
   .version("0.1.0")
   .addCommand(configCommand())

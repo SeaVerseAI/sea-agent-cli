@@ -4,7 +4,7 @@
   "description": "CLI for agent-gateway registration and chat workflows.",
   "type": "module",
   "bin": {
-    "agentctl": "./dist/index.js"
+    "seaagent": "./dist/index.js"
   },
   "scripts": {
     "build": "tsc",

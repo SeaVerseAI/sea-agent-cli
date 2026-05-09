@@ -10,7 +10,7 @@ export class AgentGatewayClient {
   static async fromConfig(): Promise<AgentGatewayClient> {
     const config = await loadConfig();
     if (!config.endpoint) {
-      throw new Error("endpoint is not configured. Run: agentctl config set endpoint <url>");
+      throw new Error("endpoint is not configured. Run: seaagent config set endpoint <url>");
     }
     return new AgentGatewayClient(config.endpoint, config.apiKey);
   }
@@ -46,7 +46,7 @@ export class AgentGatewayClient {
     if (this.apiKey) {
       headers.authorization = `Bearer ${this.apiKey}`;
     }
-    if (process.env.AGENTCTL_DEBUG === "1") {
+    if (isDebugEnabled()) {
       console.error(`WS ${url}`);
     }
 
@@ -185,11 +185,15 @@ export class AgentGatewayClient {
     if (this.apiKey) {
       headers.authorization = `Bearer ${this.apiKey}`;
     }
-    if (process.env.AGENTCTL_DEBUG === "1") {
+    if (isDebugEnabled()) {
       console.error(`${method} ${url}`);
     }
     return { headers, payload };
   }
+}
+
+function isDebugEnabled(): boolean {
+  return process.env.SEAAGENT_DEBUG === "1" || process.env.AGENTCTL_DEBUG === "1";
 }
 
 function errorMessageFromResponse(text: string): string {

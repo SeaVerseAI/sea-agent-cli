@@ -1,0 +1,4 @@
+interface:
+  display_name: "Seaagent CLI"
+  short_description: "Operate the SeaArt agent-gateway CLI"
+  default_prompt: "Use $seaagent-cli to configure the gateway and register or test an agent with the local CLI."

@@ -3,7 +3,7 @@ import { getConfigPath, loadConfig, saveConfig } from "../lib/config-store.js";
 import { printJSON } from "../lib/output.js";
 
 export function configCommand(): Command {
-  const cmd = new Command("config").description("Manage agentctl config");
+  const cmd = new Command("config").description("Manage seaagent config");
 
   cmd
     .command("set")

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Agentctl CLI"
-  short_description: "Operate the SeaArt agent-gateway CLI"
-  default_prompt: "Use $agentctl-cli to configure the gateway and register or test an agent with the local CLI."

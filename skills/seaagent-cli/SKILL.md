@@ -1,13 +1,13 @@
 ---
-name: agentctl-cli
-description: "Use this skill when working with the local agentctl CLI for SeaArt agent-gateway: configuring endpoints and API keys, registering/updating/deleting tools, skills, and agents, listing catalog entries, resolving runtime configs, and running or inspecting chats."
+name: seaagent-cli
+description: "Use this skill when working with the local seaagent CLI for SeaArt agent-gateway: configuring endpoints and API keys, registering/updating/deleting tools, skills, and agents, listing catalog entries, resolving runtime configs, and running or inspecting chats."
 ---
 
-# Agentctl CLI
+# Seaagent CLI
 
 ## Scope
 
-Use this skill when a task involves the local `agentctl` project or the SeaArt `agent-gateway` CLI workflow. The CLI mirrors the current gateway HTTP API and is intended for registration, discovery, capability inspection, lifecycle maintenance, and chat testing.
+Use this skill when a task involves the local `seaagent` CLI project or the SeaArt `agent-gateway` CLI workflow. The CLI mirrors the current gateway HTTP API and is intended for registration, discovery, capability inspection, lifecycle maintenance, and chat testing.
 
 Repositories:
 
@@ -23,22 +23,22 @@ Repositories:
    ```
 3. Prefer the built CLI for realistic behavior:
    ```bash
-   node dist/index.js --help
+   seaagent --help
    ```
 4. Inspect config before gateway operations:
    ```bash
-   node dist/index.js config get
-   node dist/index.js config path
+   seaagent config get
+   seaagent config path
    ```
 
 ## Configuration
 
-`agentctl` stores config at `~/.agentctl/config.yaml`.
+`seaagent` stores config at `~/.agentctl/config.yaml` for compatibility with existing installs.
 
 ```bash
-node dist/index.js config set endpoint http://127.0.0.1:8080
-node dist/index.js config set api-key sa-xxxxxxxx
-node dist/index.js config get
+seaagent config set endpoint http://127.0.0.1:8080
+seaagent config set api-key sa-xxxxxxxx
+seaagent config get
 ```
 
 The API key is sent as `Authorization: Bearer <api-key>`. Do not print or commit real API keys. `config get` masks stored API keys.
@@ -46,7 +46,7 @@ The API key is sent as `Authorization: Bearer <api-key>`. Do not print or commit
 For request debugging:
 
 ```bash
-AGENTCTL_DEBUG=1 node dist/index.js ...
+SEAAGENT_DEBUG=1 seaagent ...
 ```
 
 ## Payload Files
@@ -69,70 +69,70 @@ Create task-specific payload files instead of editing shared examples unless the
 System:
 
 ```bash
-node dist/index.js system health
-node dist/index.js system metrics
+seaagent system health
+seaagent system metrics
 ```
 
 Config:
 
 ```bash
-node dist/index.js config set endpoint <url>
-node dist/index.js config set api-key <key>
-node dist/index.js config get
-node dist/index.js config path
+seaagent config set endpoint <url>
+seaagent config set api-key <key>
+seaagent config get
+seaagent config path
 ```
 
 Catalog:
 
 ```bash
-node dist/index.js catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
 ```
 
 Tools:
 
 ```bash
-node dist/index.js tool register -f <payload.json|yaml>
-node dist/index.js tool list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
-node dist/index.js tool find [same filters as list]
-node dist/index.js tool get <tool-id>
-node dist/index.js tool update <tool-id> -f <payload.json|yaml>
-node dist/index.js tool delete <tool-id> --operator-id <id>
-node dist/index.js tool resolve <tool-id>
+seaagent tool register -f <payload.json|yaml>
+seaagent tool list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent tool find [same filters as list]
+seaagent tool get <tool-id>
+seaagent tool update <tool-id> -f <payload.json|yaml>
+seaagent tool delete <tool-id> --operator-id <id>
+seaagent tool resolve <tool-id>
 ```
 
 Skills:
 
 ```bash
-node dist/index.js skill register -f <payload.json|yaml>
-node dist/index.js skill tool-register -f <payload.json|yaml>
-node dist/index.js skill list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
-node dist/index.js skill get <skill-id>
-node dist/index.js skill update <skill-id> -f <payload.json|yaml>
-node dist/index.js skill delete <skill-id> --operator-id <id>
+seaagent skill register -f <payload.json|yaml>
+seaagent skill tool-register -f <payload.json|yaml>
+seaagent skill list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent skill get <skill-id>
+seaagent skill update <skill-id> -f <payload.json|yaml>
+seaagent skill delete <skill-id> --operator-id <id>
 ```
 
 Agents:
 
 ```bash
-node dist/index.js agent register -f <payload.json|yaml>
-node dist/index.js agent list [--search <value>] [--status <value>] [--owner-id <value>] [--category <value>] [--limit <n>] [--offset <n>]
-node dist/index.js agent update <agent-id> -f <payload.json|yaml>
-node dist/index.js agent delete <agent-id> --operator-id <id>
-node dist/index.js agent capabilities <agent-id>
+seaagent agent register -f <payload.json|yaml>
+seaagent agent list [--search <value>] [--status <value>] [--owner-id <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent agent update <agent-id> -f <payload.json|yaml>
+seaagent agent delete <agent-id> --operator-id <id>
+seaagent agent capabilities <agent-id>
 ```
 
 Chat:
 
 ```bash
-node dist/index.js chat run <agent-id> "<message>"
-node dist/index.js chat run --ws <agent-id> "<message>"
-node dist/index.js chat run --agent-config-file <runtime-config.json|yaml> "<message>"
-node dist/index.js chat run --no-stream <agent-id> "<message>"
-node dist/index.js chat get <chat-id>
-node dist/index.js chat events <chat-id> [--after-seq <n>] [--limit <n>]
-node dist/index.js chat stream <chat-id> [--after-seq <n>]
-node dist/index.js chat stream --ws <chat-id> [--after-seq <n>]
-node dist/index.js chat cancel <chat-id>
+seaagent chat run <agent-id> "<message>"
+seaagent chat run --ws <agent-id> "<message>"
+seaagent chat run --agent-config-file <runtime-config.json|yaml> "<message>"
+seaagent chat run --no-stream <agent-id> "<message>"
+seaagent chat get <chat-id>
+seaagent chat events <chat-id> [--after-seq <n>] [--limit <n>]
+seaagent chat stream <chat-id> [--after-seq <n>]
+seaagent chat stream --ws <chat-id> [--after-seq <n>]
+seaagent chat cancel <chat-id>
 ```
 
 ## Gateway API Mapping
