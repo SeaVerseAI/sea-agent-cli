@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import YAML from "yaml";
 import type { Config } from "../types.js";
 
-const configPath = join(homedir(), ".agentctl", "config.yaml");
+const configPath = join(homedir(), ".seaagent", "config.yaml");
 
 export async function loadConfig(): Promise<Config> {
   try {

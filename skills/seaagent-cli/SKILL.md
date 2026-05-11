@@ -33,7 +33,7 @@ Repositories:
 
 ## Configuration
 
-`seaagent` stores config at `~/.agentctl/config.yaml` for compatibility with existing installs.
+`seaagent` stores config at `~/.seaagent/config.yaml`.
 
 ```bash
 seaagent config set endpoint http://127.0.0.1:8080
