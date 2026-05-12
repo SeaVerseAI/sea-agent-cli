@@ -109,6 +109,14 @@ data: {"content":"hello world"}
 - `chat.failed`：运行失败。
 - `chat.cancelled`：运行取消。
 
+Sandbox Agent 事件：
+
+- `chat.sandbox.creating`：gateway 已根据 `agent_config.runtime.sandbox` 创建 sandbox run，事件中会带 `sandbox_run_id` / `game_run_id`。
+- `chat.sandbox.ready`：sandbox 已可用，事件中会带 `sandbox_run_id`、`workspace_root`、`preview_url`、`preview_port` 等字段。
+- `chat.sandbox.failed`：sandbox 创建或就绪失败，事件中会带 `error_code` / `error_message`。
+
+`runtime.sandbox` 是 Agent 的运行类型标记，不使用 `enabled` 字段；对象存在即表示该 Agent 需要自动拉起 sandbox。普通 Agent 不配置 `runtime.sandbox`。
+
 ## WebSocket 返回
 
 WebSocket 返回每条消息是 JSON：

@@ -43,6 +43,7 @@ seaagent skill update <skill-id> -f skill-update.json
 seaagent skill delete <skill-id> --operator-id web-tools-mcp
 
 seaagent agent register -f examples/agent-web.json
+seaagent agent register -f examples/agent-sandbox.json
 seaagent agent update <agent-id> -f agent-update.json
 seaagent agent delete <agent-id> --operator-id web-tools-mcp
 seaagent agent list
@@ -52,6 +53,11 @@ seaagent chat run web_assistant:v1 "Search recent AI news"
 seaagent chat run --ws web_assistant:v1 "Search recent AI news"
 seaagent chat run --stream-retries 5 web_assistant:v1 "Limit reconnect attempts"
 seaagent chat run --agent-config-file examples/runtime-agent-config.json "Fetch https://example.com"
+seaagent chat run --agent-config-file examples/runtime-agent-sandbox-config.json "Create a small React game"
+seaagent game get <sandbox-run-id>
+seaagent game events <sandbox-run-id>
+seaagent game command <sandbox-run-id> -c "pwd && ls"
+seaagent game refresh <sandbox-run-id>
 seaagent chat get <chat-id>
 seaagent chat events <chat-id>
 seaagent chat stream <chat-id> --after-seq 12

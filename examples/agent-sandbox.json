@@ -1,0 +1,29 @@
+{
+  "agent_key": "sandbox_game_agent:v1",
+  "category": "fabric",
+  "display_name": "Sandbox Game Agent",
+  "name": "sandbox_game_agent",
+  "description": "Agent that creates and edits a project inside a sandbox workspace.",
+  "owner_id": "internal",
+  "status": "active",
+  "metadata": {},
+  "model_config": {
+    "default": "gpt-5.5",
+    "allowed": ["gpt-5.5", "gpt-5.1-chat", "gpt-4.1-mini"]
+  },
+  "system_prompt": "You are a senior implementation agent. Work inside /agent-workspace and use sandbox runtime context when available.",
+  "agent_config": {
+    "temperature": 0.2,
+    "max_turns": 100,
+    "timeout": 1800,
+    "runtime": {
+      "sandbox": {}
+    }
+  },
+  "skills": [],
+  "permissions": {},
+  "tags": ["sandbox"],
+  "public": true,
+  "created_by": "internal",
+  "updated_by": "internal"
+}

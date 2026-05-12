@@ -361,6 +361,28 @@ function nestedStringField(data: unknown, objectField: string, field: string): s
 }
 
 function reportChatStreamProgress(event: ChatStreamEvent): void {
+  if (event.event === "chat.sandbox.creating") {
+    const runID = stringField(event.data, "sandbox_run_id") || stringField(event.data, "game_run_id");
+    const status = stringField(event.data, "status");
+    process.stderr.write(`\n[sandbox:creating${runID ? ` ${runID}` : ""}${status ? ` ${status}` : ""}]\n`);
+    return;
+  }
+
+  if (event.event === "chat.sandbox.ready") {
+    const runID = stringField(event.data, "sandbox_run_id") || stringField(event.data, "game_run_id");
+    const previewURL = stringField(event.data, "preview_url");
+    const workspaceRoot = stringField(event.data, "workspace_root");
+    const details = [runID, workspaceRoot, previewURL].filter(Boolean).join(" ");
+    process.stderr.write(`\n[sandbox:ready${details ? ` ${details}` : ""}]\n`);
+    return;
+  }
+
+  if (event.event === "chat.sandbox.failed") {
+    const message = stringField(event.data, "error_message") || stringField(event.data, "message") || "sandbox failed";
+    process.stderr.write(`\n[sandbox:failed] ${message}\n`);
+    return;
+  }
+
   if (event.event === "chat.progress") {
     const progress = numberField(event.data, "progress");
     const reason = stringField(event.data, "reason");

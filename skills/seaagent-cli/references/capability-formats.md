@@ -28,6 +28,7 @@ Discovery and runtime endpoints:
 - `skill list/get` -> `GET /v1/skills`, `GET /v1/skills/{id}`
 - `agent list/capabilities` -> `GET /v1/agents`, `GET /v1/agents/{id}/capabilities`
 - `chat run/get/events/stream/cancel` -> `/v1/chat/completions`, `/v1/chats/...`
+- `game create/get/events/logs/command/refresh/delete` -> `/v1/game/runs/...`
 
 ## Payload Shape Switching
 
@@ -357,6 +358,20 @@ Rules:
 - `model`, `config`, and `permissions` default to `{}`.
 - `skills` must contain non-empty refs and every referenced skill must resolve to active Skill current state.
 - Agent register creates an active agent by default. `enabled` is kept only for payload compatibility.
+- To mark a registered agent as a sandbox agent, add `config.runtime.sandbox`. The presence of `sandbox` is the type marker; do not add `enabled`.
+
+Sandbox concise-register config example:
+
+```json
+{
+  "temperature": 0.2,
+  "max_turns": 100,
+  "timeout": 1800,
+  "runtime": {
+    "sandbox": {}
+  }
+}
+```
 
 ## Agent Low-Level Current State
 
@@ -395,6 +410,29 @@ Create requires `created_by`; update requires `updated_by`. Every skill ref must
 
 Use the low-level update shape to fix runnable-agent issues after registration. If a no-tool chat smoke test returns a proxy timeout, first verify/update `category: "fabric"` and a known-good `model_config` before investigating tool behavior.
 
+To mark a low-level agent as a sandbox agent, add `agent_config.runtime.sandbox`. If this object is absent, the agent is treated as a normal non-sandbox agent.
+
+```json
+{
+  "agent_config": {
+    "temperature": 0.2,
+    "max_turns": 100,
+    "timeout": 1800,
+    "runtime": {
+      "sandbox": {
+        "template_id": "tpl-custom",
+        "wait_ready": true,
+        "preview_port": 3000,
+        "workspace_root": "/agent-workspace",
+        "ready_timeout_seconds": 240
+      }
+    }
+  }
+}
+```
+
+`runtime.sandbox` is a type marker. Do not use `runtime.sandbox.enabled`; sandbox behavior is selected by the presence of the object.
+
 ## Chat Payloads
 
 `chat run` builds a `ChatCompletionRequest`:
@@ -415,6 +453,7 @@ Use the low-level update shape to fix runnable-agent issues after registration. 
 - `--ws` keeps streaming enabled and uses `GET /v1/chat/completions/ws`; the CLI sends the `ChatCompletionRequest` JSON as the first WebSocket message.
 - `chat stream --ws <chat-id>` uses `GET /v1/chats/{chat-id}/ws?after_seq=...` to replay an existing run over WebSocket.
 - API key from CLI config is also injected by gateway into chat metadata when present.
+- For sandbox agents, chat streams can include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The `sandbox_run_id` / `game_run_id` from those events is the run id for `/v1/game/runs/{runID}` APIs.
 
 ## Verification
 

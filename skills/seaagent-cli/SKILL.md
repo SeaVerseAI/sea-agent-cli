@@ -60,7 +60,9 @@ Use the repo examples as starting points:
 - `examples/tool-web-fetch.json`: tool register payload
 - `examples/skill-web.json`: skill register payload
 - `examples/agent-web.json`: agent register payload
+- `examples/agent-sandbox.json`: low-level sandbox agent payload using `agent_config.runtime.sandbox`
 - `examples/runtime-agent-config.json`: inline runtime chat config
+- `examples/runtime-agent-sandbox-config.json`: inline runtime chat config that asks gateway to create a sandbox
 
 Create task-specific payload files instead of editing shared examples unless the user asks to change examples.
 
@@ -147,6 +149,18 @@ seaagent chat stream --ws <chat-id> [--after-seq <n>]
 seaagent chat cancel <chat-id>
 ```
 
+Game sandbox runs:
+
+```bash
+seaagent game create --prompt "<prompt>" [--template-id <id>] [--preview-port 3000] [--workspace-root /agent-workspace]
+seaagent game get <sandbox-run-id>
+seaagent game events <sandbox-run-id> [--after-seq <n>] [--limit <n>]
+seaagent game logs <sandbox-run-id>
+seaagent game command <sandbox-run-id> -c "<shell command>" [--cwd /agent-workspace] [--timeout <seconds>]
+seaagent game refresh <sandbox-run-id>
+seaagent game delete <sandbox-run-id>
+```
+
 ## Agent Registration Workflow
 
 For gateway mutations, use this order:
@@ -170,6 +184,43 @@ On the current SeaArt gateway, agent `category` is constrained to `fabric` or `s
 ```
 
 If a newly registered agent times out even on the no-tool smoke test, update it with the low-level `agent update` shape and set `category: "fabric"` plus the model config above, then retest before debugging tools.
+
+### Sandbox Agents
+
+Registered agents that must run inside a game/workspace sandbox are marked by adding `runtime.sandbox` to `agent_config` (or concise register `config`). The `sandbox` object is a type marker; do not add an `enabled` field. If `runtime.sandbox` is absent, the agent is a normal non-sandbox agent.
+
+Minimal low-level shape:
+
+```json
+{
+  "agent_config": {
+    "temperature": 0.2,
+    "max_turns": 100,
+    "timeout": 1800,
+    "runtime": {
+      "sandbox": {}
+    }
+  }
+}
+```
+
+Optional sandbox fields:
+
+```json
+{
+  "runtime": {
+    "sandbox": {
+      "template_id": "tpl-custom",
+      "wait_ready": true,
+      "preview_port": 3000,
+      "workspace_root": "/agent-workspace",
+      "ready_timeout_seconds": 240
+    }
+  }
+}
+```
+
+When a sandbox agent starts a chat without existing `metadata.sandbox_run_id`, agent-gateway creates a sandbox run before dispatching the worker. Streaming output may include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The resulting `sandbox_run_id` can be used with the existing `/v1/game/runs/{runID}` APIs.
 
 ## Chat Runtime Caveats
 
@@ -209,6 +260,13 @@ Long media-generation requests can exceed the front proxy timeout and return `50
 - `chat stream` -> `GET /v1/chats/{chat-id}/stream`
 - `chat stream --ws` -> `GET /v1/chats/{chat-id}/ws?after_seq=...`
 - `chat cancel` -> `POST /v1/chats/{chat-id}/cancel`
+- `game create` -> `POST /v1/game/runs`
+- `game get` -> `GET /v1/game/runs/{run-id}`
+- `game events` -> `GET /v1/game/runs/{run-id}/events`
+- `game logs` -> `GET /v1/game/runs/{run-id}/logs`
+- `game command` -> `POST /v1/game/runs/{run-id}/commands`
+- `game refresh` -> `POST /v1/game/runs/{run-id}/refresh`
+- `game delete` -> `DELETE /v1/game/runs/{run-id}`
 
 ## Payload Shape Switching
 
