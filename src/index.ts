@@ -4,7 +4,7 @@ import { agentCommand } from "./commands/agent.js";
 import { catalogCommand } from "./commands/catalog.js";
 import { chatCommand } from "./commands/chat.js";
 import { configCommand } from "./commands/config.js";
-import { gameCommand } from "./commands/game.js";
+import { gameCommand, sandboxCommand } from "./commands/game.js";
 import { hookCommand } from "./commands/hook.js";
 import { skillCommand } from "./commands/skill.js";
 import { systemCommand } from "./commands/system.js";
@@ -23,6 +23,7 @@ program
   .addCommand(skillCommand())
   .addCommand(agentCommand())
   .addCommand(hookCommand())
+  .addCommand(sandboxCommand())
   .addCommand(gameCommand())
   .addCommand(chatCommand());
 

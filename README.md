@@ -62,13 +62,21 @@ seaagent chat run --ws production-line-123:web_assistant:v1 "Search recent AI ne
 seaagent chat run --stream-retries 5 production-line-123:web_assistant:v1 "Limit reconnect attempts"
 seaagent chat run --agent-config-file examples/runtime-agent-config.json "Fetch https://example.com"
 seaagent chat run --agent-config-file examples/runtime-agent-sandbox-config.json "Create a small React game"
-seaagent game get <sandbox-run-id>
-seaagent game events <sandbox-run-id>
-seaagent game command <sandbox-run-id> -c "pwd && ls"
-seaagent game refresh <sandbox-run-id>
+seaagent sandbox get <sandbox-run-id>
+seaagent sandbox events <sandbox-run-id>
+seaagent sandbox stream <sandbox-run-id>
+seaagent sandbox logs <sandbox-run-id>
+seaagent sandbox files <sandbox-run-id> --path /agent-workspace
+seaagent sandbox read <sandbox-run-id> --path /agent-workspace/package.json
+seaagent sandbox archive <sandbox-run-id> --path /agent-workspace -o workspace.tgz
+seaagent sandbox command <sandbox-run-id> -c "pwd && ls"
+seaagent sandbox refresh <sandbox-run-id>
+seaagent sandbox resume <sandbox-run-id>
 seaagent chat get <chat-id>
 seaagent chat events <chat-id>
 seaagent chat stream <chat-id> --after-seq 12
 seaagent chat stream --ws <chat-id>
 seaagent chat cancel <chat-id>
 ```
+
+`seaagent game ...` remains as a legacy alias for deployments and scripts that still use `/v1/game/runs`.

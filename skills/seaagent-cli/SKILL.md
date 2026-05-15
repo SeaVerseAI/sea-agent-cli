@@ -180,17 +180,24 @@ seaagent chat stream --ws <chat-id> [--after-seq <n>]
 seaagent chat cancel <chat-id>
 ```
 
-Game sandbox runs:
+Sandbox runs:
 
 ```bash
-seaagent game create --prompt "<prompt>" [--template-id <id>] [--preview-port 3000] [--workspace-root /agent-workspace]
-seaagent game get <sandbox-run-id>
-seaagent game events <sandbox-run-id> [--after-seq <n>] [--limit <n>]
-seaagent game logs <sandbox-run-id>
-seaagent game command <sandbox-run-id> -c "<shell command>" [--cwd /agent-workspace] [--timeout <seconds>]
-seaagent game refresh <sandbox-run-id>
-seaagent game delete <sandbox-run-id>
+seaagent sandbox create --prompt "<prompt>" [--template-id <id>] [--sandbox-template react-game] [--preview-port 3000] [--workspace-root /agent-workspace]
+seaagent sandbox get <sandbox-run-id>
+seaagent sandbox events <sandbox-run-id> [--after-seq <n>] [--limit <n>]
+seaagent sandbox stream <sandbox-run-id> [--after-seq <n>]
+seaagent sandbox logs <sandbox-run-id> [--limit <n>]
+seaagent sandbox files <sandbox-run-id> [--path /agent-workspace]
+seaagent sandbox read <sandbox-run-id> --path /agent-workspace/package.json
+seaagent sandbox archive <sandbox-run-id> --path /agent-workspace -o workspace.tgz
+seaagent sandbox command <sandbox-run-id> -c "<shell command>" [--cwd /agent-workspace] [--timeout <seconds>] [--env KEY=value]
+seaagent sandbox refresh <sandbox-run-id>
+seaagent sandbox resume <sandbox-run-id>
+seaagent sandbox delete <sandbox-run-id>
 ```
+
+`seaagent game ...` is a legacy alias for the same run lifecycle on `/v1/game/runs`; prefer `sandbox` for new work.
 
 ## Agent Registration Workflow
 
@@ -255,7 +262,7 @@ Optional sandbox fields:
 
 Allowed `sandbox_template` values are `react-game` and `react-web`.
 
-When a sandbox agent starts a chat without existing `metadata.sandbox_run_id`, agent-gateway creates a sandbox run before dispatching the worker. Streaming output may include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The resulting `sandbox_run_id` can be used with the existing `/v1/game/runs/{runID}` APIs.
+When a sandbox agent starts a chat without existing `metadata.sandbox_run_id`, agent-gateway creates a sandbox run before dispatching the worker. Streaming output may include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The resulting `sandbox_run_id` can be used with the `/v1/sandbox/runs/{runID}` APIs; `/v1/game/runs/{runID}` remains a legacy compatibility route.
 
 ## Chat Runtime Caveats
 
@@ -300,13 +307,19 @@ Long media-generation requests can exceed the front proxy timeout and return `50
 - `chat stream` -> `GET /v1/chats/{chat-id}/stream`
 - `chat stream --ws` -> `GET /v1/chats/{chat-id}/ws?after_seq=...`
 - `chat cancel` -> `POST /v1/chats/{chat-id}/cancel`
-- `game create` -> `POST /v1/game/runs`
-- `game get` -> `GET /v1/game/runs/{run-id}`
-- `game events` -> `GET /v1/game/runs/{run-id}/events`
-- `game logs` -> `GET /v1/game/runs/{run-id}/logs`
-- `game command` -> `POST /v1/game/runs/{run-id}/commands`
-- `game refresh` -> `POST /v1/game/runs/{run-id}/refresh`
-- `game delete` -> `DELETE /v1/game/runs/{run-id}`
+- `sandbox create` -> `POST /v1/sandbox/runs`
+- `sandbox get` -> `GET /v1/sandbox/runs/{run-id}`
+- `sandbox events` -> `GET /v1/sandbox/runs/{run-id}/events`
+- `sandbox stream` -> `GET /v1/sandbox/runs/{run-id}/stream`
+- `sandbox logs` -> `GET /v1/sandbox/runs/{run-id}/logs`
+- `sandbox files` -> `GET /v1/sandbox/runs/{run-id}/files`
+- `sandbox read` -> `GET /v1/sandbox/runs/{run-id}/files/content`
+- `sandbox archive` -> `GET /v1/sandbox/runs/{run-id}/files/archive`
+- `sandbox command` -> `POST /v1/sandbox/runs/{run-id}/commands`
+- `sandbox refresh` -> `POST /v1/sandbox/runs/{run-id}/refresh`
+- `sandbox resume` -> `POST /v1/sandbox/runs/{run-id}/resume`
+- `sandbox delete` -> `DELETE /v1/sandbox/runs/{run-id}`
+- `game ...` -> legacy equivalents on `/v1/game/runs`
 
 ## Payload Shape Switching
 

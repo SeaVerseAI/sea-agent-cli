@@ -32,7 +32,8 @@ Discovery and runtime endpoints:
 - `agent list/capabilities` -> `GET /v1/agents`, `GET /v1/agents/{id}/capabilities`
 - `hook list/get` -> `GET /v1/hooks`, `GET /v1/hooks/{id}`
 - `chat run/get/events/stream/cancel` -> `/v1/chat/completions`, `/v1/chats/...`
-- `game create/get/events/logs/command/refresh/delete` -> `/v1/game/runs/...`
+- `sandbox create/get/events/stream/logs/files/read/archive/command/refresh/resume/delete` -> `/v1/sandbox/runs/...`
+- `game ...` -> legacy equivalents on `/v1/game/runs/...`
 
 ## Payload Shape Switching
 
@@ -491,7 +492,7 @@ Rules:
 - `--ws` keeps streaming enabled and uses `GET /v1/chat/completions/ws`; the CLI sends the `ChatCompletionRequest` JSON as the first WebSocket message.
 - `chat stream --ws <chat-id>` uses `GET /v1/chats/{chat-id}/ws?after_seq=...` to replay an existing run over WebSocket.
 - API key from CLI config is also injected by gateway into chat metadata when present.
-- For sandbox agents, chat streams can include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The `sandbox_run_id` / `game_run_id` from those events is the run id for `/v1/game/runs/{runID}` APIs.
+- For sandbox agents, chat streams can include `chat.sandbox.creating`, `chat.sandbox.ready`, and `chat.sandbox.failed`. The `sandbox_run_id` / `game_run_id` from those events is the run id for `/v1/sandbox/runs/{runID}` APIs; `/v1/game/runs/{runID}` remains a legacy route.
 
 ## Verification
 

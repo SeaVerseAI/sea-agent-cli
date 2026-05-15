@@ -25,6 +25,10 @@ export class AgentGatewayClient {
     return this.requestText("GET", this.buildURL(path, query));
   }
 
+  async getBytes(path: string, query?: Record<string, string | number | boolean | undefined>): Promise<Buffer> {
+    return this.requestBytes("GET", this.buildURL(path, query));
+  }
+
   async getStream(path: string, query: Record<string, string | number | boolean | undefined> | undefined, onChunk: (chunk: string) => void): Promise<void> {
     await this.requestStream("GET", this.buildURL(path, query), undefined, onChunk);
   }
@@ -153,6 +157,21 @@ export class AgentGatewayClient {
       throw new Error(`${response.statusCode}: ${errorMessageFromResponse(text)}`);
     }
     return text;
+  }
+
+  private async requestBytes(method: Dispatcher.HttpMethod, url: string, body?: unknown, accept = "*/*"): Promise<Buffer> {
+    const { headers, payload } = this.buildRequest(method, url, body, accept);
+    const response = await request(url, {
+      method,
+      headers,
+      body: payload,
+    });
+    const arrayBuffer = await response.body.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    if (response.statusCode >= 400) {
+      throw new Error(`${response.statusCode}: ${errorMessageFromResponse(buffer.toString("utf8"))}`);
+    }
+    return buffer;
   }
 
   private async requestStream(method: Dispatcher.HttpMethod, url: string, body: unknown, onChunk: (chunk: string) => void): Promise<void> {
