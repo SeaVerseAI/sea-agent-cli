@@ -24,7 +24,6 @@
     },
     "required": ["url"]
   },
-  "tags": [],
   "public": false,
   "enabled": true
 }

@@ -99,14 +99,14 @@ seaagent config path
 Catalog:
 
 ```bash
-seaagent catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--public true|false] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--source-kind <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 ```
 
 Tools:
 
 ```bash
 seaagent tool register -f <payload.json|yaml>
-seaagent tool list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--public true|false] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent tool list [--search <value>] [--status <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 seaagent tool find [same filters as list]
 seaagent tool get <tool-id>
 seaagent tool update <tool-id> -f <payload.json|yaml>
@@ -119,7 +119,7 @@ Skills:
 ```bash
 seaagent skill register -f <payload.json|yaml>
 seaagent skill tool-register -f <payload.json|yaml>
-seaagent skill list [--search <value>] [--status <value>] [--source-kind <value>] [--owner-id <value>] [--public true|false] [--provider <value>] [--category <value>] [--limit <n>] [--offset <n>]
+seaagent skill list [--search <value>] [--status <value>] [--source-kind <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 seaagent skill get <skill-id>
 seaagent skill update <skill-id> -f <payload.json|yaml>
 seaagent skill delete <skill-id> --operator-id <id>
@@ -290,8 +290,8 @@ Long media-generation requests can exceed the front proxy timeout and return `50
 
 Tool and Skill use one exposed create endpoint, `/register`, but the gateway handler accepts two payload shapes:
 
-- Tool register shape: no `tool_key`, `source_kind`, `openai_schema`, or `runtime_id`; the gateway parses `ToolRegisterRequest` and adapts it into current Tool state.
-- Tool low-level shape: includes any of `tool_key`, `source_kind`, `openai_schema`, or `runtime_id`; the gateway parses `ToolCreateRequest`.
+- Tool register shape: no `tool_key`, `openai_schema`, or `runtime_id`; the gateway parses `ToolRegisterRequest` and adapts it into current Tool state.
+- Tool low-level shape: includes any of `tool_key`, `openai_schema`, or `runtime_id`; the gateway parses `ToolCreateRequest`.
 - Skill register shape: no `skill_key`, `source_kind`, or `manifest`; the gateway parses `SkillRegisterRequest` and adapts it into current Skill state.
 - Skill low-level shape: includes any of `skill_key`, `source_kind`, or `manifest`; the gateway parses `SkillCreateRequest`.
 - Agent register shape: no `agent_key`, `model_config`, or `agent_config`; the gateway parses `AgentRegisterRequest`.
@@ -299,8 +299,8 @@ Tool and Skill use one exposed create endpoint, `/register`, but the gateway han
 
 Update endpoints have similar Tool/Skill switching:
 
-- `tool update` with a register-shape payload updates via `ToolRegisterRequest`; with `tool_key`, `source_kind`, `metadata`, `openai_schema`, `runtime_id`, or `slug`, it updates via `ToolUpdateRequest`.
-- `skill update` with a register-shape payload updates via `SkillRegisterRequest`; with `skill_key`, `source_kind`, `metadata`, `manifest`, or `slug`, it updates via `SkillUpdateRequest`.
+- `tool update` with a register-shape payload updates via `ToolRegisterRequest`; with `tool_key`, `metadata`, `openai_schema`, or `runtime_id`, it updates via `ToolUpdateRequest`.
+- `skill update` with a register-shape payload updates via `SkillRegisterRequest`; with `skill_key`, `source_kind`, `metadata`, or `manifest`, it updates via `SkillUpdateRequest`.
 - `agent update` only accepts the low-level `AgentUpdateRequest` shape.
 
 ## Safety Notes

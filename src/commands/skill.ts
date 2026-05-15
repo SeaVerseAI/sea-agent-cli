@@ -29,10 +29,8 @@ export function skillCommand(): Command {
     .option("--search <value>")
     .option("--status <value>")
     .option("--source-kind <value>")
-    .option("--owner-id <value>")
     .option("--public <true|false>")
     .option("--provider <value>")
-    .option("--category <value>")
     .option("--limit <number>", "page size", "20")
     .option("--offset <number>", "page offset", "0")
     .action(async (options) => {
@@ -41,10 +39,8 @@ export function skillCommand(): Command {
         search: options.search,
         status: options.status,
         source_kind: options.sourceKind,
-        owner_id: options.ownerId,
         public: options.public,
         provider: options.provider,
-        category: options.category,
         limit: options.limit,
         offset: options.offset,
       });

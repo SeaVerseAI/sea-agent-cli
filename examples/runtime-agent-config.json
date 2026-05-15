@@ -2,7 +2,6 @@
   "agent": {
     "id": "inline_web_agent",
     "name": "inline_web_agent",
-    "display_name": "Inline Web Agent",
     "model": "gpt-4o",
     "temperature": 0.2,
     "max_turns": 20,
@@ -42,9 +41,6 @@
         }
       }
     ],
-    "permissions": {
-      "allow_web_access": true
-    },
     "config": {}
   }
 }

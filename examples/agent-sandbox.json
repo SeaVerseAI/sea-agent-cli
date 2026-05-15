@@ -1,9 +1,7 @@
 {
   "agent_key": "sandbox_game_agent:v1",
   "category": "fabric",
-  "display_name": "Sandbox Game Agent",
   "name": "sandbox_game_agent",
-  "description": "Agent that creates and edits a project inside a sandbox workspace.",
   "owner_id": "internal",
   "status": "active",
   "metadata": {},
@@ -21,9 +19,6 @@
     }
   },
   "skills": [],
-  "permissions": {},
-  "tags": ["sandbox"],
-  "public": true,
   "created_by": "internal",
   "updated_by": "internal"
 }

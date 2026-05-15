@@ -2,8 +2,6 @@
   "id": "web_assistant:v1",
   "name": "web_assistant",
   "version": "v1",
-  "display_name": "Web Assistant",
-  "description": "Assistant with web fetching skill.",
   "category": "web",
   "scheduler_category": "agent",
   "model": {
@@ -17,12 +15,6 @@
     "max_turns": 20,
     "timeout": 600
   },
-  "permissions": {
-    "allow_web_access": true
-  },
-  "tags": ["web"],
-  "public": true,
   "enabled": true,
-  "owner_id": "web-tools-mcp",
   "created_by": "web-tools-mcp"
 }

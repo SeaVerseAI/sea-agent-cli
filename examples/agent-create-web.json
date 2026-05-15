@@ -1,10 +1,7 @@
 {
   "agent_key": "web_assistant:v1",
-  "category": "web",
-  "scheduler_category": "agent",
-  "display_name": "Web Assistant",
+  "category": "fabric",
   "name": "web_assistant",
-  "description": "Assistant with web fetching skill.",
   "owner_id": "web-tools-mcp",
   "status": "active",
   "metadata": {},
@@ -19,10 +16,5 @@
     "timeout": 600
   },
   "skills": ["web_skill:v1"],
-  "permissions": {
-    "allow_web_access": true
-  },
-  "tags": ["web"],
-  "public": true,
   "created_by": "web-tools-mcp"
 }

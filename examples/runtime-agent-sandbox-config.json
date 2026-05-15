@@ -2,7 +2,6 @@
   "agent": {
     "id": "inline_sandbox_agent",
     "name": "inline_sandbox_agent",
-    "display_name": "Inline Sandbox Agent",
     "model": "gpt-5.5",
     "temperature": 0.2,
     "max_turns": 100,

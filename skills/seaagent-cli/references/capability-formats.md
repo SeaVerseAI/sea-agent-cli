@@ -40,12 +40,12 @@ Discovery and runtime endpoints:
 
 Tool register switching:
 
-- Concise register shape if none of these fields are present: `tool_key`, `source_kind`, `openai_schema`, `runtime_id`.
+- Concise register shape if none of these fields are present: `tool_key`, `openai_schema`, `runtime_id`.
 - Low-level `ToolCreateRequest` shape if any of those fields is present.
 
 Tool update switching:
 
-- Concise register update shape if none of these fields are present: `tool_key`, `source_kind`, `metadata`, `openai_schema`, `runtime_id`, `slug`.
+- Concise register update shape if none of these fields are present: `tool_key`, `metadata`, `openai_schema`, `runtime_id`.
 - Low-level `ToolUpdateRequest` shape if any of those fields is present.
 
 Skill register switching:
@@ -55,7 +55,7 @@ Skill register switching:
 
 Skill update switching:
 
-- Concise register update shape if none of these fields are present: `skill_key`, `source_kind`, `metadata`, `manifest`, `slug`.
+- Concise register update shape if none of these fields are present: `skill_key`, `source_kind`, `metadata`, `manifest`.
 - Low-level `SkillUpdateRequest` shape if any of those fields is present.
 
 Agent register switching:
@@ -79,9 +79,9 @@ Statuses:
 
 - Capability status: `draft`, `active`, `deprecated`, `disabled`, `deleted`.
 - Concise register payloads create active capabilities by default. `enabled` is kept only for payload compatibility and no longer turns registration into draft.
-- Tool and Skill `public` defaults to `false`. Private Tool/Skill records are visible only to the same production line owner; public records can be reused across production lines.
+- Tool and Skill `public` defaults to `false`. Private records are visible only to the same production line owner; public records can be reused across production lines.
 
-JSON object fields must contain valid objects when present. Use `{}` for empty `metadata`, `config`, `permissions`, `auth`, or `model` values, and `[]` for empty arrays.
+JSON object fields must contain valid objects when present. Use `{}` for empty `metadata`, `config`, `auth`, or `model` values, and `[]` for empty arrays.
 
 Do not put real secrets in payloads. For auth, use a reference such as:
 
@@ -105,7 +105,6 @@ Also usable with `tool update <id> -f file` if the payload does not include low-
   "provider": "provider",
   "name": "tool_name",
   "version": "v1",
-  "category": "general",
   "transport": "http",
   "description": "What the tool does.",
   "endpoint": "https://tool.example.com/invoke",
@@ -122,10 +121,8 @@ Also usable with `tool update <id> -f file` if the payload does not include low-
   },
   "auth": {"type": "none"},
   "config": {"timeout_ms": 10000},
-  "tags": [],
   "public": false,
   "enabled": true,
-  "owner_id": "provider",
   "created_by": "provider",
   "updated_by": "provider"
 }
@@ -134,7 +131,7 @@ Also usable with `tool update <id> -f file` if the payload does not include low-
 Rules:
 
 - `name` and `description` are required.
-- `provider` defaults to `internal`; `version` defaults to `v1`; `category` defaults to `general`.
+- `provider` defaults to `internal`; `version` defaults to `v1`.
 - `id` defaults to `provider:name:version` and becomes current `runtime_id`; `tool_key` also defaults to `provider:name:version`.
 - `method` defaults to `POST`.
 - Timeout defaults to `10000` ms. `config.timeout_ms` is milliseconds; `config.timeout` below `10000` is treated as seconds.
@@ -153,7 +150,6 @@ Builtin example:
   "provider": "seaart",
   "name": "generate_image",
   "version": "v1",
-  "category": "media",
   "transport": "builtin",
   "description": "SeaArt image generation.",
   "parameters": {
@@ -169,9 +165,7 @@ Builtin example:
     "function": "seaart.generate_image",
     "timeout_ms": 300000
   },
-  "tags": ["seaart", "image", "builtin"],
   "enabled": true,
-  "owner_id": "seaart",
   "created_by": "seaart"
 }
 ```
@@ -185,10 +179,6 @@ Use with `tool register` to create if the payload includes low-level trigger fie
   "tool_key": "provider:tool_name:v1",
   "provider": "provider",
   "name": "tool_name",
-  "slug": "provider-tool-name-v1",
-  "category": "general",
-  "description": "What the tool does.",
-  "source_kind": "external",
   "runtime_id": "provider:tool_name:v1",
   "openai_schema": {
     "type": "function",
@@ -206,13 +196,10 @@ Use with `tool register` to create if the payload includes low-level trigger fie
   "auth_type": "none",
   "auth_config": {},
   "timeout_ms": 10000,
-  "checksum": "provider:tool_name:v1",
   "changelog": "Current config.",
-  "owner_id": "provider",
   "public": false,
   "status": "active",
   "metadata": {},
-  "tags": [],
   "created_by": "provider",
   "updated_by": "provider"
 }
@@ -255,7 +242,6 @@ Also usable with `skill update <id> -f file` if the payload does not include low
   "tags": [],
   "public": false,
   "enabled": true,
-  "owner_id": "provider",
   "created_by": "provider",
   "updated_by": "provider"
 }
@@ -285,14 +271,10 @@ Use with `skill register` to create if the payload includes low-level trigger fi
 ```json
 {
   "skill_key": "provider:skill_name:v1",
-  "display_name": "Skill Name",
   "name": "skill_name",
-  "slug": "provider-skill-name-v1",
   "provider": "provider",
-  "category": "general",
   "description": "What the skill helps with.",
   "source_kind": "external",
-  "bundle_uri": "",
   "manifest": {
     "id": "provider:skill_name:v1",
     "name": "skill_name",
@@ -308,21 +290,16 @@ Use with `skill register` to create if the payload includes low-level trigger fi
     "triggers": {},
     "tags": []
   },
-  "entry_file": "SKILL.md",
-  "dependencies": [],
-  "checksum": "provider:skill_name:v1",
   "changelog": "Current manifest.",
-  "owner_id": "provider",
   "public": false,
   "status": "active",
   "metadata": {},
-  "tags": [],
   "created_by": "provider",
   "updated_by": "provider"
 }
 ```
 
-Create requires `created_by`; update requires `updated_by`. `manifest.name` and `manifest.instruction` must be non-empty. If manifest file lists are present, they must include `entry_file`.
+Create requires `created_by`; update requires `updated_by`. `manifest.name` and `manifest.instruction` must be non-empty.
 
 ## Agent Concise Register
 
@@ -337,8 +314,6 @@ seaagent agent register -f <payload.json>
   "id": "agent_name:v1",
   "name": "agent_name",
   "version": "v1",
-  "display_name": "Agent Name",
-  "description": "What the agent does.",
   "category": "fabric",
   "model": {
     "default": "gpt-5.1-chat",
@@ -351,8 +326,6 @@ seaagent agent register -f <payload.json>
     "max_turns": 20,
     "timeout": 600
   },
-  "permissions": {},
-  "tags": [],
   "enabled": true,
   "owner_id": "internal",
   "created_by": "internal"
@@ -361,10 +334,10 @@ seaagent agent register -f <payload.json>
 
 Rules:
 
-- `name`, `description`, `category`, `owner_id`, and `created_by` are required after defaults.
+- `name`, `category`, `owner_id`, and `created_by` are required after defaults.
 - Current SeaArt gateway deployments may reject arbitrary categories; use `fabric` for standard runnable agents and `seaactor` only when that category is explicitly required.
-- `version` defaults to `v1`; `id` defaults to `name:version`; `display_name` defaults to `name`; `owner_id` defaults to `internal`.
-- `model`, `config`, and `permissions` default to `{}`.
+- `version` defaults to `v1`; `id` defaults to `name:version`; `owner_id` defaults to `internal`.
+- `model` and `config` default to `{}`.
 - `skills` must contain non-empty refs and every referenced skill must resolve to active Skill current state visible to the agent owner. Private Skill refs owned by another production line are rejected.
 - Agent register creates an active agent by default. `enabled` is kept only for payload compatibility.
 - To mark a registered agent as a sandbox agent, add `config.runtime.sandbox`. The presence of `sandbox` is the type marker; do not add `enabled`.
@@ -390,9 +363,7 @@ Use with `agent register` to create if the payload includes low-level trigger fi
 {
   "agent_key": "agent_name:v1",
   "category": "fabric",
-  "display_name": "Agent Name",
   "name": "agent_name",
-  "description": "What the agent does.",
   "owner_id": "internal",
   "status": "active",
   "metadata": {},
@@ -407,8 +378,6 @@ Use with `agent register` to create if the payload includes low-level trigger fi
     "timeout": 600
   },
   "skills": ["provider:skill_name:v1"],
-  "permissions": {},
-  "tags": [],
   "created_by": "internal",
   "updated_by": "internal"
 }

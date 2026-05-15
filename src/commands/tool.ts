@@ -20,11 +20,8 @@ export function toolCommand(): Command {
     const response = await client.get("/v1/tools", {
       search: options.search,
       status: options.status,
-      source_kind: options.sourceKind,
-      owner_id: options.ownerId,
       public: options.public,
       provider: options.provider,
-      category: options.category,
       limit: options.limit,
       offset: options.offset,
     });
@@ -36,11 +33,8 @@ export function toolCommand(): Command {
     .description("List tools")
     .option("--search <value>")
     .option("--status <value>")
-    .option("--source-kind <value>")
-    .option("--owner-id <value>")
     .option("--public <true|false>")
     .option("--provider <value>")
-    .option("--category <value>")
     .option("--limit <number>", "page size", "20")
     .option("--offset <number>", "page offset", "0")
     .action(list);
@@ -50,11 +44,8 @@ export function toolCommand(): Command {
     .description("Alias of list with search filters")
     .option("--search <value>")
     .option("--status <value>")
-    .option("--source-kind <value>")
-    .option("--owner-id <value>")
     .option("--public <true|false>")
     .option("--provider <value>")
-    .option("--category <value>")
     .option("--limit <number>", "page size", "20")
     .option("--offset <number>", "page offset", "0")
     .action(list);
