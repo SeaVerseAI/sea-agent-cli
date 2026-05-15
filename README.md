@@ -15,13 +15,15 @@ npm link
 ```bash
 seaagent config set endpoint http://127.0.0.1:8080
 seaagent config set api-key sa-xxxxxxxx
+seaagent config set user-id production-line-123
 seaagent config get
 ```
 
-The API key is sent as:
+The API key and production-line identity are sent as:
 
 ```http
 Authorization: Bearer sa-xxxxxxxx
+X-User-ID: production-line-123
 ```
 
 ## Usage
@@ -47,7 +49,7 @@ seaagent agent register -f examples/agent-sandbox.json
 seaagent agent update <agent-id> -f agent-update.json
 seaagent agent delete <agent-id> --operator-id web-tools-mcp
 seaagent agent list
-seaagent agent capabilities web_assistant:v1
+seaagent agent capabilities production-line-123:web_assistant:v1
 
 seaagent hook register -f examples/hook.json
 seaagent hook list
@@ -55,9 +57,9 @@ seaagent hook get <hook-id>
 seaagent hook update <hook-id> -f hook-update.json
 seaagent hook delete <hook-id>
 
-seaagent chat run web_assistant:v1 "Search recent AI news"
-seaagent chat run --ws web_assistant:v1 "Search recent AI news"
-seaagent chat run --stream-retries 5 web_assistant:v1 "Limit reconnect attempts"
+seaagent chat run production-line-123:web_assistant:v1 "Search recent AI news"
+seaagent chat run --ws production-line-123:web_assistant:v1 "Search recent AI news"
+seaagent chat run --stream-retries 5 production-line-123:web_assistant:v1 "Limit reconnect attempts"
 seaagent chat run --agent-config-file examples/runtime-agent-config.json "Fetch https://example.com"
 seaagent chat run --agent-config-file examples/runtime-agent-sandbox-config.json "Create a small React game"
 seaagent game get <sandbox-run-id>

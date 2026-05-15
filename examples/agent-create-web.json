@@ -1,8 +1,7 @@
 {
-  "agent_key": "web_assistant:v1",
   "category": "fabric",
   "name": "web_assistant",
-  "owner_id": "web-tools-mcp",
+  "owner_id": "production-line-123",
   "status": "active",
   "metadata": {},
   "model_config": {
@@ -15,6 +14,6 @@
     "max_turns": 20,
     "timeout": 600
   },
-  "skills": ["web_skill:v1"],
-  "created_by": "web-tools-mcp"
+  "skills": ["production-line-123:web_skill:v1"],
+  "created_by": "production-line-123"
 }

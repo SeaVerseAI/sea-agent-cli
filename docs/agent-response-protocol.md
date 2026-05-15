@@ -20,7 +20,7 @@
 ```json
 {
   "request_id": "optional-request-id",
-  "agent_id": "agent_name:v1",
+  "agent_id": "owner_id:agent_name:v1",
   "category": "fabric",
   "agent_config": {},
   "messages": [

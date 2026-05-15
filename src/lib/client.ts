@@ -5,6 +5,7 @@ export class AgentGatewayClient {
   constructor(
     private readonly endpoint: string,
     private readonly apiKey?: string,
+    private readonly userId?: string,
   ) {}
 
   static async fromConfig(): Promise<AgentGatewayClient> {
@@ -12,7 +13,7 @@ export class AgentGatewayClient {
     if (!config.endpoint) {
       throw new Error("endpoint is not configured. Run: seaagent config set endpoint <url>");
     }
-    return new AgentGatewayClient(config.endpoint, config.apiKey);
+    return new AgentGatewayClient(config.endpoint, config.apiKey, config.userId);
   }
 
   async get(path: string, query?: Record<string, string | number | boolean | undefined>): Promise<unknown> {
@@ -45,6 +46,9 @@ export class AgentGatewayClient {
     const headers: Record<string, string> = {};
     if (this.apiKey) {
       headers.authorization = `Bearer ${this.apiKey}`;
+    }
+    if (this.userId) {
+      headers["X-User-ID"] = this.userId;
     }
     if (isDebugEnabled()) {
       console.error(`WS ${url}`);
@@ -184,6 +188,9 @@ export class AgentGatewayClient {
     }
     if (this.apiKey) {
       headers.authorization = `Bearer ${this.apiKey}`;
+    }
+    if (this.userId) {
+      headers["X-User-ID"] = this.userId;
     }
     if (isDebugEnabled()) {
       console.error(`${method} ${url}`);

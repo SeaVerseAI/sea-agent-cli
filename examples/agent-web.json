@@ -1,20 +1,17 @@
 {
-  "id": "web_assistant:v1",
   "name": "web_assistant",
   "version": "v1",
-  "category": "web",
-  "scheduler_category": "agent",
+  "category": "fabric",
   "model": {
     "default": "gpt-4o",
     "allowed": ["gpt-4o"]
   },
   "system_prompt": "You are a practical web research assistant.",
-  "skills": ["web_skill:v1"],
+  "skills": ["production-line-123:web_skill:v1"],
   "config": {
     "temperature": 0.2,
     "max_turns": 20,
     "timeout": 600
   },
-  "enabled": true,
-  "created_by": "web-tools-mcp"
+  "enabled": true
 }

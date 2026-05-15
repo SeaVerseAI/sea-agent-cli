@@ -7,7 +7,7 @@ export function configCommand(): Command {
 
   cmd
     .command("set")
-    .argument("<key>", "endpoint or api-key")
+    .argument("<key>", "endpoint, api-key, or user-id")
     .argument("<value>")
     .action(async (key: string, value: string) => {
       const config = await loadConfig();
@@ -15,8 +15,10 @@ export function configCommand(): Command {
         config.endpoint = value;
       } else if (key === "api-key") {
         config.apiKey = value;
+      } else if (key === "user-id") {
+        config.userId = value;
       } else {
-        throw new Error("supported keys: endpoint, api-key");
+        throw new Error("supported keys: endpoint, api-key, user-id");
       }
       await saveConfig(config);
       console.log(`saved ${key} to ${getConfigPath()}`);
