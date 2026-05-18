@@ -16,11 +16,11 @@ Create/register uses only `/register`:
 Maintenance endpoints:
 
 - `tool update <id> -f file` -> `PUT /v1/tools/{id}`
-- `tool delete <id> --operator-id <id>` -> `DELETE /v1/tools/{id}?operator_id=...`
+- `tool delete <id>` -> `DELETE /v1/tools/{id}`
 - `skill update <id> -f file` -> `PUT /v1/skills/{id}`
-- `skill delete <id> --operator-id <id>` -> `DELETE /v1/skills/{id}?operator_id=...`
+- `skill delete <id>` -> `DELETE /v1/skills/{id}`
 - `agent update <id> -f file` -> `PUT /v1/agents/{id}`
-- `agent delete <id> --operator-id <id>` -> `DELETE /v1/agents/{id}?operator_id=...`
+- `agent delete <id>` -> `DELETE /v1/agents/{id}`
 - `hook update <id> -f file` -> `PUT /v1/hooks/{id}`
 - `hook delete <id>` -> `DELETE /v1/hooks/{id}`
 

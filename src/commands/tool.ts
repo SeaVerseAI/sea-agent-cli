@@ -69,12 +69,9 @@ export function toolCommand(): Command {
     .command("delete")
     .description("Delete a tool via /v1/tools/{tool-id}")
     .argument("<tool-id>")
-    .requiredOption("--operator-id <id>", "operator id used for ownership validation")
-    .action(async (toolID: string, options: { operatorId: string }) => {
+    .action(async (toolID: string) => {
       const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/tools/${encodeURIComponent(toolID)}`, {
-        operator_id: options.operatorId,
-      }));
+      printJSON(await client.delete(`/v1/tools/${encodeURIComponent(toolID)}`));
     });
 
   cmd

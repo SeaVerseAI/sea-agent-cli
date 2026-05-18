@@ -66,12 +66,9 @@ export function skillCommand(): Command {
     .command("delete")
     .description("Delete a skill via /v1/skills/{skill-id}")
     .argument("<skill-id>")
-    .requiredOption("--operator-id <id>", "operator id used for ownership validation")
-    .action(async (skillID: string, options: { operatorId: string }) => {
+    .action(async (skillID: string) => {
       const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/skills/${encodeURIComponent(skillID)}`, {
-        operator_id: options.operatorId,
-      }));
+      printJSON(await client.delete(`/v1/skills/${encodeURIComponent(skillID)}`));
     });
 
   return cmd;

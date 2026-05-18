@@ -29,12 +29,9 @@ export function agentCommand(): Command {
     .command("delete")
     .description("Delete an agent via /v1/agents/{agent-id}")
     .argument("<agent-id>")
-    .requiredOption("--operator-id <id>", "operator id used for ownership validation")
-    .action(async (agentID: string, options: { operatorId: string }) => {
+    .action(async (agentID: string) => {
       const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/agents/${encodeURIComponent(agentID)}`, {
-        operator_id: options.operatorId,
-      }));
+      printJSON(await client.delete(`/v1/agents/${encodeURIComponent(agentID)}`));
     });
 
   cmd
