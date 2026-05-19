@@ -18,6 +18,5 @@
   },
   "tags": ["web"],
   "public": false,
-  "enabled": true,
-  "created_by": "web-tools-mcp"
+  "enabled": true
 }

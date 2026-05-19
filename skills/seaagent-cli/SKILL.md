@@ -87,7 +87,7 @@ Command argument conventions:
 - `--status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`; use `active` for normal discovery.
 - `--limit` is bounded by the gateway to `1..100`; values outside that range default to `20`.
 - `--offset` must be `0` or greater; negative values are normalized to `0`.
-- Tool/Skill `--public` and Skill `--source-kind` are legacy filters while schema slimming is in progress; avoid relying on them for new automation unless the target gateway still exposes those columns.
+- Tool/Skill `--public` is a compatibility filter while schema slimming is in progress; Skill lists no longer expose source-kind filtering.
 - Agent `category` is not a display taxonomy. It is the resource scheduling class used by gateway to map runs to Scheduler pools.
 
 System:
@@ -109,7 +109,7 @@ seaagent config path
 Catalog:
 
 ```bash
-seaagent catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--source-kind <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
+seaagent catalog list [--capability-type tool|skill] [--search <value>] [--status <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 ```
 
 Tools:
@@ -131,7 +131,7 @@ Skills:
 ```bash
 seaagent skill register -f <payload.json|yaml>
 seaagent skill tool-register -f <payload.json|yaml>
-seaagent skill list [--search <value>] [--status <value>] [--source-kind <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
+seaagent skill list [--search <value>] [--status <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 seaagent skill get <skill-id>
 seaagent skill update <skill-id> -f <payload.json|yaml>
 seaagent skill delete <skill-id>
@@ -348,15 +348,16 @@ Tool and Skill use one exposed create endpoint, `/register`, but the gateway han
 
 - Tool register shape: no `openai_schema` or `runtime_id`; the gateway parses `ToolRegisterRequest` and adapts it into current Tool state.
 - Tool low-level shape: includes `openai_schema` or `runtime_id`; the gateway parses `ToolCreateRequest` and returns a UUID `id`.
-- Skill register shape: no `source_kind` or `manifest`; the gateway parses `SkillRegisterRequest` and adapts it into current Skill state.
-- Skill low-level shape: includes `source_kind` or `manifest`; the gateway parses `SkillCreateRequest` and returns a UUID `id`.
+- Skill register shape: no `manifest`; the gateway parses `SkillRegisterRequest` and adapts it into current Skill state.
+- Skill low-level shape: includes `manifest`; the gateway parses `SkillCreateRequest` and returns a UUID `id`.
+- Skill metadata is reserved by gateway and stored as `{}`; put runtime config and migration notes in `manifest`, not `skills.metadata`.
 - Agent register shape: no `model_config` or `agent_config`; the gateway parses `AgentRegisterRequest`.
 - Agent low-level shape: includes `model_config` or `agent_config`; the gateway parses `AgentCreateRequest` and returns a UUID `id`.
 
 Update endpoints have similar Tool/Skill switching:
 
 - `tool update` with a register-shape payload updates via `ToolRegisterRequest`; with `metadata`, `openai_schema`, or `runtime_id`, it updates via `ToolUpdateRequest`.
-- `skill update` with a register-shape payload updates via `SkillRegisterRequest`; with `source_kind`, `metadata`, or `manifest`, it updates via `SkillUpdateRequest`.
+- `skill update` with a register-shape payload updates via `SkillRegisterRequest`; with `manifest`, it updates via `SkillUpdateRequest`.
 - `agent update` only accepts the low-level `AgentUpdateRequest` shape.
 
 ## Safety Notes

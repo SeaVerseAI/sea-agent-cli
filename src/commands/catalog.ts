@@ -11,7 +11,6 @@ export function catalogCommand(): Command {
     .option("--capability-type <value>", "tool or skill")
     .option("--search <value>")
     .option("--status <value>")
-    .option("--source-kind <value>")
     .option("--public <true|false>")
     .option("--provider <value>")
     .option("--limit <number>", "page size", "20")
@@ -22,7 +21,6 @@ export function catalogCommand(): Command {
         capability_type: options.capabilityType,
         search: options.search,
         status: options.status,
-        source_kind: options.sourceKind,
         public: options.public,
         provider: options.provider,
         limit: options.limit,

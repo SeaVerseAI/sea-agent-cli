@@ -52,14 +52,14 @@ Tool update switching:
 
 Skill register switching:
 
-- Concise register shape if none of these fields are present: `source_kind`, `manifest`.
-- Low-level `SkillCreateRequest` shape if `source_kind` or `manifest` is present.
+- Concise register shape if `manifest` is absent.
+- Low-level `SkillCreateRequest` shape if `manifest` is present.
 - Do not send removed `skill_key` fields; agent-gateway returns an immutable UUID `id`.
 
 Skill update switching:
 
-- Concise register update shape if none of these fields are present: `source_kind`, `metadata`, `manifest`.
-- Low-level `SkillUpdateRequest` shape if any of those fields is present.
+- Concise register update shape if `manifest` is absent.
+- Low-level `SkillUpdateRequest` shape if `manifest` is present.
 
 Agent register switching:
 
@@ -95,7 +95,7 @@ List pagination:
 Resource and runtime enums:
 
 - Agent `category`: `fabric`, `seaactor`. This is a gateway Scheduler resource class, not a display category.
-- Skill `source_kind`: `embedded`, `external`. This is legacy low-level metadata; do not send it from concise register payloads unless the gateway still requires the low-level shape.
+- Skill `metadata` is reserved by the gateway and stored as `{}`; do not put migration notes, display data, or runtime config in `skills.metadata`.
 - Tool `execution_mode`: `local`, `remote`.
 - Tool `transport`: `http`, `grpc`, `queue`, `custom`. Concise payloads also accept compatibility values `builtin` and `mcp`, which are adapted into runtime metadata.
 - Tool `response_mode`: `json`, `sse`.
@@ -115,8 +115,8 @@ Schema-slimming guidance:
 - Agent `category` must stay in gateway because it drives resource scheduling.
 - Do not add removed `tool_key`, `skill_key`, or `agent_key` fields to register payloads.
 - Prefer `provider` over owner-like fields for Tool and Skill identity. `owner_id` is being removed from Tool and Skill flows.
-- Avoid Tool metadata that only serves catalog display in gateway payloads: `slug`, `category`, `description`, `tags`, `source_kind`, and `checksum`.
-- Avoid Skill metadata that only serves catalog display or package bookkeeping in gateway payloads: `display_name`, `category`, `tags`, `slug`, `entry_file`, `dependencies`, `bundle_uri`, `checksum`, and `owner_id`.
+- Avoid Tool metadata that only serves catalog display in gateway payloads: `slug`, `category`, `description`, `tags`, and `checksum`.
+- Do not send Skill metadata in gateway payloads; the gateway stores `skills.metadata` as `{}`. Keep runtime config in `manifest.config` and display data in server/catalog layers.
 - If a deployed gateway still requires an old field, keep it only in a compatibility payload and do not rely on it in Agent Worker runtime behavior.
 
 ## Tool Concise Register
@@ -172,7 +172,7 @@ Rules:
 - `transport: "builtin"` creates local embedded current-state tool metadata. Put `{"type":"builtin","name":"provider:tool_name","function":"provider.tool_name"}` in `config`.
 - `transport: "mcp"` creates remote custom MCP metadata and does not require `endpoint`. Put MCP metadata in `config`.
 - Do not send removed `tool_key` fields on `/v1/tools/register`.
-- Do not send `slug`, `category`, `tags`, `source_kind`, `checksum`, or `owner_id` in new Tool payloads.
+- Do not send `slug`, `category`, `tags`, `checksum`, or `owner_id` in new Tool payloads.
 
 Builtin example:
 
@@ -271,9 +271,7 @@ Also usable with `skill update <id> -f file` if the payload does not include low
   },
   "tags": [],
   "public": false,
-  "enabled": true,
-  "created_by": "provider",
-  "updated_by": "provider"
+  "enabled": true
 }
 ```
 
@@ -305,7 +303,6 @@ Use with `skill register` to create if the payload includes low-level trigger fi
   "name": "skill_name",
   "provider": "provider",
   "description": "What the skill helps with.",
-  "source_kind": "external",
   "manifest": {
     "id": "11111111-1111-4111-8111-111111111111",
     "name": "skill_name",
@@ -321,16 +318,12 @@ Use with `skill register` to create if the payload includes low-level trigger fi
     "triggers": {},
     "tags": []
   },
-  "changelog": "Current manifest.",
   "public": false,
-  "status": "active",
-  "metadata": {},
-  "created_by": "provider",
-  "updated_by": "provider"
+  "status": "active"
 }
 ```
 
-Create requires `created_by`; update requires `updated_by`. `manifest.name` and `manifest.instruction` must be non-empty. Low-level `source_kind` accepts `embedded` or `external`; prefer omitting low-level source metadata from new payloads unless a deployed gateway still requires it. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`.
+Create and update use the provider bound by the gateway request identity. `manifest.name` and `manifest.instruction` must be non-empty. Skill metadata is stored as `{}`. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`.
 
 ## Agent Concise Register
 

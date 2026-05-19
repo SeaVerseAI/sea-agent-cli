@@ -45,7 +45,6 @@ export function skillCommand(): Command {
     .command("list")
     .option("--search <value>")
     .option("--status <value>")
-    .option("--source-kind <value>")
     .option("--public <true|false>")
     .option("--provider <value>")
     .option("--limit <number>", "page size", "20")
@@ -55,7 +54,6 @@ export function skillCommand(): Command {
       const response = await client.get("/v1/skills", {
         search: options.search,
         status: options.status,
-        source_kind: options.sourceKind,
         public: options.public,
         provider: options.provider,
         limit: options.limit,
