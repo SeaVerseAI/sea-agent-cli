@@ -84,7 +84,7 @@ function inferResourceID(payload: unknown): string | undefined {
   if (!isRecord(payload)) {
     return undefined;
   }
-  const explicitID = stringField(payload, "id") ?? stringField(payload, "agent_key") ?? stringField(payload, "skill_key") ?? stringField(payload, "tool_key");
+  const explicitID = stringField(payload, "id");
   if (explicitID) {
     return explicitID;
   }

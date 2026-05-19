@@ -6,7 +6,7 @@
   "description": "Fetch and process web pages.",
   "category": "web",
   "provider": "web-tools-mcp",
-  "required_tools": ["web-tools-mcp:web_fetch:v1"],
+  "required_tools": ["22222222-2222-4222-8222-222222222222"],
   "optional_tools": [],
   "instruction": "Use web tools to fetch pages and answer with concise summaries.",
   "config": {

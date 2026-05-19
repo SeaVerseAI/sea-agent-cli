@@ -49,7 +49,7 @@ seaagent agent register -f examples/agent-sandbox.json
 seaagent agent update <agent-id> -f agent-update.json
 seaagent agent delete <agent-id>
 seaagent agent list
-seaagent agent capabilities production-line-123:web_assistant:v1
+seaagent agent capabilities 33333333-3333-4333-8333-333333333333
 
 seaagent hook register -f examples/hook.json
 seaagent hook list
@@ -57,9 +57,9 @@ seaagent hook get <hook-id>
 seaagent hook update <hook-id> -f hook-update.json
 seaagent hook delete <hook-id>
 
-seaagent chat run production-line-123:web_assistant:v1 "Search recent AI news"
-seaagent chat run --ws production-line-123:web_assistant:v1 "Search recent AI news"
-seaagent chat run --stream-retries 5 production-line-123:web_assistant:v1 "Limit reconnect attempts"
+seaagent chat run 33333333-3333-4333-8333-333333333333 "Search recent AI news"
+seaagent chat run --ws 33333333-3333-4333-8333-333333333333 "Search recent AI news"
+seaagent chat run --stream-retries 5 33333333-3333-4333-8333-333333333333 "Limit reconnect attempts"
 seaagent chat run --agent-config-file examples/runtime-agent-config.json "Fetch https://example.com"
 seaagent chat run --agent-config-file examples/runtime-agent-sandbox-config.json "Create a small React game"
 seaagent sandbox get <sandbox-run-id>
