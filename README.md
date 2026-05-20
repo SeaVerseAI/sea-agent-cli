@@ -19,6 +19,10 @@ seaagent config set user-id production-line-123
 seaagent config get
 ```
 
+`endpoint` can be either the gateway base URL or a URL that already includes
+`/agent-v2`. When `/agent-v2` is missing, the CLI adds it automatically before
+sending requests.
+
 The API key and production-line identity are sent as:
 
 ```http

@@ -9,12 +9,16 @@ Config file:
   ~/.seaagent/config.yaml
 
 Supported keys:
-  endpoint   Base URL for agent-gateway, for example http://127.0.0.1:8080
+  endpoint   Gateway base URL or URL with /agent-v2, for example http://127.0.0.1:8080
   api-key    Sent as Authorization: Bearer <api-key>
   user-id    Sent as X-User-ID for ownership-sensitive registry operations
 
+Endpoint compatibility:
+  If endpoint does not include /agent-v2, requests automatically use /agent-v2.
+
 Examples:
   seaagent config set endpoint http://127.0.0.1:8080
+  seaagent config set endpoint http://127.0.0.1:8080/agent-v2
   seaagent config set api-key sa-xxxxxxxx
   seaagent config set user-id production-line-123
   seaagent config get

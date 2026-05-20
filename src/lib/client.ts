@@ -2,11 +2,15 @@ import { request, WebSocket, type Dispatcher } from "undici";
 import { loadConfig } from "./config-store.js";
 
 export class AgentGatewayClient {
+  private readonly endpoint: string;
+
   constructor(
-    private readonly endpoint: string,
+    endpoint: string,
     private readonly apiKey?: string,
     private readonly userId?: string,
-  ) {}
+  ) {
+    this.endpoint = normalizeAgentGatewayEndpoint(endpoint);
+  }
 
   static async fromConfig(): Promise<AgentGatewayClient> {
     const config = await loadConfig();
@@ -220,6 +224,24 @@ export class AgentGatewayClient {
     }
     return { headers, payload };
   }
+}
+
+export function normalizeAgentGatewayEndpoint(endpoint: string): string {
+  if (endpoint.trim() === "") {
+    return endpoint;
+  }
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return endpoint;
+  }
+  const segments = url.pathname.split("/").filter(Boolean);
+  if (!segments.includes("agent-v2")) {
+    segments.push("agent-v2");
+  }
+  url.pathname = `/${segments.join("/")}`;
+  return url.toString();
 }
 
 function isDebugEnabled(): boolean {

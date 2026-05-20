@@ -41,6 +41,9 @@ seaagent config set api-key sa-xxxxxxxx
 seaagent config get
 ```
 
+`endpoint` may be the gateway base URL or a URL that already includes
+`/agent-v2`. The CLI automatically adds `/agent-v2` when it is missing.
+
 The API key is sent as `Authorization: Bearer <api-key>`. Do not print or commit real API keys. `config get` masks stored API keys.
 
 For request debugging:

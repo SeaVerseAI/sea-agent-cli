@@ -33,6 +33,8 @@ program
 addHelpText(program, `
 Configuration:
   seaagent stores connection settings in ~/.seaagent/config.yaml.
+  The endpoint may be a gateway base URL or a URL that already includes /agent-v2.
+  If /agent-v2 is missing, requests add it automatically.
   Configure endpoint and credentials before calling gateway-backed commands:
     seaagent config set endpoint http://127.0.0.1:8080
     seaagent config set api-key sa-xxxxxxxx
