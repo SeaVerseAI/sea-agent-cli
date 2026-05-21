@@ -216,6 +216,8 @@ seaagent chat run --no-stream <agent-id> "hello"
 非流式模式下，CLI 打印完整 JSON `ChatCompletionResponse`。
 如果返回里包含 `run_id`，CLI 会额外读取该 run 的历史事件并拼接文本增量；
 成功拼到最终文本时，会补充到 `response.message.content`，方便脚本直接读取 Agent 实际回复。
+失败时，如果历史事件包含 `response.failed` / `chat.failed` 等错误事件，
+CLI 会尽量补充 `response.error`、`error_message`、`error_code`。
 
 WebSocket 模式：
 

@@ -159,6 +159,8 @@ export class AgentGatewayClient {
       method,
       headers,
       body: payload,
+    }).catch((err) => {
+      throw requestFailureError(method, url, err);
     });
     const text = await response.body.text();
     if (response.statusCode >= 400) {
@@ -173,6 +175,8 @@ export class AgentGatewayClient {
       method,
       headers,
       body: payload,
+    }).catch((err) => {
+      throw requestFailureError(method, url, err);
     });
     const arrayBuffer = await response.body.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
@@ -188,6 +192,8 @@ export class AgentGatewayClient {
       method,
       headers,
       body: payload,
+    }).catch((err) => {
+      throw requestFailureError(method, url, err);
     });
     if (response.statusCode >= 400) {
       const text = await response.body.text();
@@ -246,6 +252,22 @@ export function normalizeAgentGatewayEndpoint(endpoint: string): string {
 
 function isDebugEnabled(): boolean {
   return process.env.SEAAGENT_DEBUG === "1";
+}
+
+function requestFailureError(method: Dispatcher.HttpMethod, url: string, err: unknown): Error {
+  const message = err instanceof Error ? err.message : String(err);
+  const target = safeURLPreview(url);
+  return new Error(`${message}; request failed for ${method} ${target}. Check endpoint with 'seaagent config get', run 'seaagent system health', then retry.`);
+}
+
+function safeURLPreview(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.search = "";
+    return parsed.toString();
+  } catch {
+    return url;
+  }
 }
 
 function errorMessageFromResponse(text: string): string {

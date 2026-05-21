@@ -48,8 +48,10 @@ Examples:
   cmd.command("get").description("Print config as JSON, masking apiKey").action(async () => {
     const config = await loadConfig();
     printJSON({
-      ...config,
-      apiKey: config.apiKey ? maskSecret(config.apiKey) : undefined,
+      endpoint: config.endpoint ?? null,
+      apiKey: config.apiKey ? maskSecret(config.apiKey) : null,
+      userId: config.userId ?? null,
+      warnings: config.userId ? [] : ["user-id is not configured; registry register/update/delete commands may use gateway defaults for ownership."],
     });
   });
 

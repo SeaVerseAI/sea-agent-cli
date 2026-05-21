@@ -15,6 +15,14 @@ Agent categories:
   fabric    Normal Fabric scheduler pool
   seaactor  SeaActor scheduler pool
 
+Common list filters:
+  --search <value>      Match agent names and metadata
+  --status <value>      draft | active | deprecated | disabled | deleted
+  --owner-id <value>    Owner/production-line ID
+  --category <value>    fabric | seaactor
+  --limit <number>      Page size
+  --offset <number>     Page offset
+
 ${payloadFileHelp}
 
 Examples:
@@ -38,7 +46,20 @@ Examples:
 Payload notes:
   - category is required by current gateway deployments: fabric or seaactor.
   - Do not send agent_key for new registrations; gateway returns an immutable UUID.
-  - Runtime settings belong in config/agent_config.`)
+  - Reuse existing skills by putting their immutable UUIDs in skills.
+  - Runtime settings belong in config/agent_config.
+
+Minimal payload:
+  {
+    "name": "weather_assistant",
+    "version": "v1",
+    "category": "fabric",
+    "model": {"default": "claude-sonnet-4-6-seawork"},
+    "system_prompt": "You are a concise assistant.",
+    "skills": ["<skill-uuid>"],
+    "config": {"temperature": 0.2},
+    "enabled": true
+  }`)
     .action(async (options: { file: string }) => {
       const client = await AgentGatewayClient.fromConfig();
       const payload = await readPayload(options.file);

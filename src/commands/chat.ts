@@ -166,7 +166,8 @@ async function completeNonStreamingChatResponse(client: AgentGatewayClient, resp
     return response;
   }
   const content = collectAssistantText(events);
-  if (!content) {
+  const failure = collectFailure(events);
+  if (!content && !failure) {
     return response;
   }
 
@@ -174,8 +175,20 @@ async function completeNonStreamingChatResponse(client: AgentGatewayClient, resp
   if (!target) {
     return response;
   }
-  const message = ensureObjectProperty(ensureObjectProperty(target, "response"), "message");
-  message.content = content;
+  const responseObject = ensureObjectProperty(target, "response");
+  if (content) {
+    const message = ensureObjectProperty(responseObject, "message");
+    message.content = content;
+  }
+  if (failure) {
+    responseObject.error = compactObject({
+      code: failure.code,
+      message: failure.message,
+      type: failure.type,
+    });
+    target.error_code = failure.code;
+    target.error_message = failure.message;
+  }
   return response;
 }
 
@@ -251,6 +264,22 @@ function collectAssistantText(events: ChatStreamEvent[]): string {
   return text;
 }
 
+type ChatFailure = {
+  code?: string;
+  message: string;
+  type?: string;
+};
+
+function collectFailure(events: ChatStreamEvent[]): ChatFailure | undefined {
+  let failure: ChatFailure | undefined;
+  for (const event of events) {
+    if (event.event === "error" || event.event === "chat.failed" || event.event === "response.failed" || event.event === "chat.cancelled" || event.event === "response.cancelled") {
+      failure = failureFromStreamEvent(event);
+    }
+  }
+  return failure;
+}
+
 function itemsFromChatEventsResponse(response: unknown): unknown[] {
   const data = objectField(response, "data");
   const items = Array.isArray(objectField(response, "items"))
@@ -304,6 +333,10 @@ function ensureObjectProperty(object: Record<string, unknown>, field: string): R
   const next: Record<string, unknown> = {};
   object[field] = next;
   return next;
+}
+
+function compactObject(object: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(object).filter(([, value]) => value !== undefined && value !== ""));
 }
 
 async function runChatStreamWithResume(client: AgentGatewayClient, payload: unknown, useWebSocket: boolean, renderer: ChatStreamRenderer, options: StreamRetryOptions): Promise<void> {
@@ -668,9 +701,21 @@ function isTerminalStreamEvent(event: string): boolean {
 }
 
 function errorFromStreamEvent(event: ChatStreamEvent): Error {
-  const code = stringField(event.data, "error_code") || stringField(event.data, "code");
-  const message = stringField(event.data, "error_message") || stringField(event.data, "message") || stringField(event.data, "error") || JSON.stringify(event.data);
-  return new Error(`${code ? `${code}: ` : ""}${message}`);
+  const failure = failureFromStreamEvent(event);
+  return new Error(`${failure.code ? `${failure.code}: ` : ""}${failure.message}`);
+}
+
+function failureFromStreamEvent(event: ChatStreamEvent): ChatFailure {
+  const response = objectField(event.data, "response");
+  const error = objectField(response, "error") || objectField(event.data, "error");
+  const code = stringField(event.data, "error_code") || stringField(event.data, "code") || stringField(error, "code");
+  const message = stringField(event.data, "error_message")
+    || stringField(event.data, "message")
+    || stringField(error, "message")
+    || stringField(event.data, "error")
+    || JSON.stringify(event.data);
+  const type = stringField(error, "type") || stringField(event.data, "type");
+  return { code: code || undefined, message, type: type || undefined };
 }
 
 function retryOptionsFromCommand(options: { streamRetries: string; retryDelayMs: string }): StreamRetryOptions {

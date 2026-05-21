@@ -42,13 +42,15 @@ seaagent config set api-key sa-xxxxxxxx
 seaagent config get
 ```
 
-The API key is sent as `Authorization: Bearer <api-key>`. Do not print or commit real API keys. `config get` masks stored API keys.
+The API key is sent as `Authorization: Bearer <api-key>`. Do not print or commit real API keys. `config get` masks stored API keys, prints `userId` as `null` when unset, and includes an ownership warning for registry mutations when `user-id` is missing.
 
 For request debugging:
 
 ```bash
 SEAAGENT_DEBUG=1 seaagent ...
 ```
+
+If a gateway request fails with DNS or connection errors, the CLI appends the request method/path and suggests `seaagent config get`, `seaagent system health`, and retrying.
 
 ## Payload Files
 
@@ -190,6 +192,8 @@ seaagent chat stream <chat-id> [--after-seq <n>]
 seaagent chat stream --ws <chat-id> [--after-seq <n>]
 seaagent chat cancel <chat-id>
 ```
+
+`chat run --no-stream` enriches successful runs with `response.message.content` when stored events are available. Failed runs are enriched with `response.error`, `error_message`, and `error_code` when failure events contain that data.
 
 Sandbox runs:
 
