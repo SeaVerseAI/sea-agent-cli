@@ -96,6 +96,7 @@ Resource and runtime enums:
 - Agent `category`: `fabric`, `seaactor`. This is a gateway Scheduler resource class, not a display category.
 - Skill `metadata` is reserved by the gateway and stored as `{}`; do not put migration notes, display data, or runtime config in `skills.metadata`.
 - Tool `runtime_type`: `http`, `builtin`, `mcp`. Concise payloads still accept old `transport` compatibility values and convert them into `runtime_type`.
+- Worker tool `name` comes only from the outer Tool `name`. The gateway keeps provider-like prefixes such as `seaart:create_polishing`, but removes trailing version suffixes such as `:v1`. Do not put duplicate names in `metadata.name` or `openai_schema.function.name`.
 - HTTP tools keep `method` in runtime metadata and forward it to Agent Worker; default is `POST`.
 - Tool `response_mode`: `json`, `sse`.
 
@@ -110,6 +111,7 @@ Schema-slimming guidance:
 - Do not add removed `tool_key`, `skill_key`, or `agent_key` fields to register payloads.
 - Prefer `provider` over owner-like fields for Tool and Skill identity. `owner_id` is being removed from Tool and Skill flows.
 - Avoid Tool metadata that only serves catalog display in gateway payloads: `slug`, `category`, `description`, `tags`, and `checksum`.
+- Do not send Tool metadata fields that duplicate outer/current-state data or are not forwarded to Worker: `name`, `function`, `timeout_ms`, `response_content_type`, `request_headers`, `schema_contract`.
 - Do not send Skill or Agent metadata in gateway payloads; the gateway stores both as `{}`. Keep Skill runtime config in `manifest.config`, Agent runtime config in `config`/`agent_config`, and display data in server/catalog layers.
 - If a deployed gateway still requires an old field, keep it only in a compatibility payload and do not rely on it in Agent Worker runtime behavior.
 
@@ -142,7 +144,7 @@ Also usable with `tool update <id> -f file` if the payload does not include low-
     "properties": {},
     "required": []
   },
-  "config": {"timeout_ms": 10000},
+  "config": {},
   "public": false,
   "enabled": true
 }
@@ -154,13 +156,13 @@ Rules:
 - `provider` defaults to `internal`; `version` defaults to `v1`.
 - The gateway may normalize `provider` to an internal provider UUID; use the returned provider value for later `--provider` filters.
 - `runtime_type` defaults to `http` when `endpoint` is present, otherwise to `builtin`; `method` defaults to `POST` and is forwarded to Agent Worker.
-- Timeout defaults to `10000` ms. `config.timeout_ms` is milliseconds; `config.timeout` below `10000` is treated as seconds.
+- Timeout defaults to `10000` ms. Concise input still accepts `config.timeout_ms` or `config.timeout` for compatibility, converts it to the outer `timeout_ms`, and removes it from stored metadata.
 - `response_mode` defaults to `json`; allowed values are `json` and `sse`.
 - `poll_interval` and `poll_timeout` are seconds. Use positive values only; omit polling fields for synchronous tools.
 - Polling fields are stored in `tools.metadata` and forwarded into runtime `agent.tools[]`.
-- `parameters` becomes `openai_schema.function.parameters`.
+- `name` is the Worker tool name; keep provider-like prefixes when they are part of the worker name, but do not include a trailing version suffix such as `:v1`. `parameters` becomes `openai_schema.function.parameters`; `openai_schema.function.name` is omitted.
 - `runtime_type: "http"` tools must provide `endpoint`.
-- `runtime_type: "builtin"` creates embedded current-state tool metadata. Put `{"type":"builtin","name":"provider:tool_name","function":"provider.tool_name"}` in `config`.
+- `runtime_type: "builtin"` creates embedded current-state tool metadata. Put only Worker ToolSpec fields such as `type`, `response_mode`, and polling settings in `config`; do not put duplicate `name` or `function` fields there.
 - `runtime_type: "mcp"` creates MCP metadata and does not require `endpoint`. Put MCP metadata in `config`.
 - Do not send removed `tool_key` fields on `/v1/tools/register`.
 - Do not send `slug`, `category`, `tags`, `checksum`, or `owner_id` in new Tool payloads.
@@ -182,10 +184,7 @@ Builtin example:
     "required": ["prompt"]
   },
   "config": {
-    "type": "builtin",
-    "name": "seaart:generate_image",
-    "function": "seaart.generate_image",
-    "timeout_ms": 300000
+    "type": "builtin"
   },
   "enabled": true
 }
@@ -202,7 +201,6 @@ Use with `tool register` to create if the payload includes low-level trigger fie
   "openai_schema": {
     "type": "function",
     "function": {
-      "name": "tool_name",
       "description": "What the tool does.",
       "parameters": {"type": "object", "properties": {}, "required": []}
     }
@@ -218,7 +216,7 @@ Use with `tool register` to create if the payload includes low-level trigger fie
 }
 ```
 
-The OpenAI function name must stay stable when updating the same tool. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`; use `active` for tools that agents may bind.
+The outer Tool `name` is the stable Worker tool name. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`; use `active` for tools that agents may bind.
 
 ## Skill Concise Register
 
