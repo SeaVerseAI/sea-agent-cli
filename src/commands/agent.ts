@@ -9,7 +9,7 @@ import { withRegisterErrorHint } from "../lib/registry-hints.js";
 export function agentCommand(): Command {
   const cmd = addHelpText(new Command("agent").description("Register and inspect agents"), `
 Agents bind skills and runtime configuration into runnable gateway resources.
-Use immutable agent UUIDs returned by the gateway for update/delete/capabilities/chat.
+Use immutable agent UUIDs returned by the gateway for update/capabilities/chat.
 
 Agent categories:
   fabric    Normal Fabric scheduler pool
@@ -93,15 +93,6 @@ Example:
         resourceID: agentID,
       });
       printJSON(await client.put(`/v1/agents/${encodeURIComponent(agentID)}`, payload));
-    });
-
-  cmd
-    .command("delete")
-    .description("Delete an agent via /v1/agents/{agent-id}")
-    .argument("<agent-id>", "agent UUID")
-    .action(async (agentID: string) => {
-      const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/agents/${encodeURIComponent(agentID)}`));
     });
 
   cmd

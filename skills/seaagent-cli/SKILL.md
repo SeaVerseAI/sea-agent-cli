@@ -132,7 +132,6 @@ seaagent tool list [--search <value>] [--status <value>] [--public true|false] [
 seaagent tool find [same filters as list]
 seaagent tool get <tool-id>
 seaagent tool update <tool-id> -f <payload.json|yaml>
-seaagent tool delete <tool-id>
 seaagent tool resolve <tool-id>
 ```
 
@@ -146,7 +145,6 @@ seaagent skill tool-register -f <payload.json|yaml>
 seaagent skill list [--search <value>] [--status <value>] [--public true|false] [--provider <value>] [--limit <n>] [--offset <n>]
 seaagent skill get <skill-id>
 seaagent skill update <skill-id> -f <payload.json|yaml>
-seaagent skill delete <skill-id>
 ```
 
 Use `skill register` for agent-facing operating instructions and tool bindings. Keep display-only fields such as `display_name`, `category`, and `tags` out of new payloads where the target gateway accepts the slim shape; those fields belong in server/catalog metadata after the migration. `skill tool-register` is only a convenience alias for tool registration.
@@ -158,7 +156,6 @@ seaagent agent register -f <payload.json|yaml>
 seaagent agent list [--search <value>] [--status <value>] [--owner-id <value>] [--category <value>] [--limit <n>] [--offset <n>]
 seaagent agent get <agent-id>
 seaagent agent update <agent-id> -f <payload.json|yaml>
-seaagent agent delete <agent-id>
 seaagent agent capabilities <agent-id>
 ```
 
@@ -319,19 +316,16 @@ Long media-generation requests can exceed the front proxy timeout and return `50
 - `tool list/find` -> `GET /v1/tools`
 - `tool get` -> `GET /v1/tools/{tool-id}`
 - `tool update` -> `PUT /v1/tools/{tool-id}`
-- `tool delete` -> `DELETE /v1/tools/{tool-id}`
 - `tool resolve` -> `GET /v1/tools/{tool-id}/resolve`
 - `skill register` -> `POST /v1/skills/register`
 - `skill tool-register` -> `POST /v1/tools/register`
 - `skill list` -> `GET /v1/skills`
 - `skill get` -> `GET /v1/skills/{skill-id}`
 - `skill update` -> `PUT /v1/skills/{skill-id}`
-- `skill delete` -> `DELETE /v1/skills/{skill-id}`
 - `agent register` -> `POST /v1/agents/register`
 - `agent list` -> `GET /v1/agents`
 - `agent get` -> `GET /v1/agents/{agent-id}`
 - `agent update` -> `PUT /v1/agents/{agent-id}`
-- `agent delete` -> `DELETE /v1/agents/{agent-id}`
 - `agent capabilities` -> `GET /v1/agents/{agent-id}/capabilities`
 - `hook register` -> `POST /v1/hooks/register`
 - `hook list` -> `GET /v1/hooks`

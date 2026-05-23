@@ -51,7 +51,7 @@ Examples:
       endpoint: config.endpoint ?? null,
       apiKey: config.apiKey ? maskSecret(config.apiKey) : null,
       userId: config.userId ?? null,
-      warnings: config.userId ? [] : ["user-id is not configured; registry register/update/delete commands may use gateway defaults for ownership."],
+      warnings: config.userId ? [] : ["user-id is not configured; registry register/update commands may use gateway defaults for ownership."],
     });
   });
 

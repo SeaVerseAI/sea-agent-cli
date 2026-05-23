@@ -9,7 +9,7 @@ import { warnProviderNormalized, withRegisterErrorHint } from "../lib/registry-h
 export function skillCommand(): Command {
   const cmd = addHelpText(new Command("skill").description("Register and inspect skills"), `
 Skills are agent-facing instructions plus tool bindings.
-Use immutable skill UUIDs returned by the gateway for get/update/delete.
+Use immutable skill UUIDs returned by the gateway for get/update.
 
 ${commonListHelp}
 
@@ -130,15 +130,6 @@ Example:
         resourceID: skillID,
       });
       printJSON(await client.put(`/v1/skills/${encodeURIComponent(skillID)}`, payload));
-    });
-
-  cmd
-    .command("delete")
-    .description("Delete a skill via /v1/skills/{skill-id}")
-    .argument("<skill-id>", "skill UUID")
-    .action(async (skillID: string) => {
-      const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/skills/${encodeURIComponent(skillID)}`));
     });
 
   return cmd;

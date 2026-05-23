@@ -9,7 +9,7 @@ import { warnProviderNormalized, withRegisterErrorHint } from "../lib/registry-h
 export function toolCommand(): Command {
   const cmd = addHelpText(new Command("tool").description("Register and inspect tools used by skills"), `
 Tools describe executable capabilities that skills can bind to.
-Use immutable tool UUIDs returned by the gateway for get/update/delete/resolve.
+Use immutable tool UUIDs returned by the gateway for get/update/resolve.
 
 ${commonListHelp}
 
@@ -121,15 +121,6 @@ Examples:
         resourceID: toolID,
       });
       printJSON(await client.put(`/v1/tools/${encodeURIComponent(toolID)}`, payload));
-    });
-
-  cmd
-    .command("delete")
-    .description("Delete a tool via /v1/tools/{tool-id}")
-    .argument("<tool-id>", "tool UUID")
-    .action(async (toolID: string) => {
-      const client = await AgentGatewayClient.fromConfig();
-      printJSON(await client.delete(`/v1/tools/${encodeURIComponent(toolID)}`));
     });
 
   cmd

@@ -47,18 +47,15 @@ seaagent tool register -f examples/tool-web-fetch.json
 seaagent tool find --provider web-tools-mcp --status active
 seaagent tool get <tool-id>
 seaagent tool update <tool-id> -f tool-update.json
-seaagent tool delete <tool-id>
 
 seaagent skill register -f examples/skill-web.json
 seaagent skill list --status active
 seaagent skill get <skill-id>
 seaagent skill update <skill-id> -f skill-update.json
-seaagent skill delete <skill-id>
 
 seaagent agent register -f examples/agent-web.json
 seaagent agent register -f examples/agent-sandbox.json
 seaagent agent update <agent-id> -f agent-update.json
-seaagent agent delete <agent-id>
 seaagent agent list
 seaagent agent get 33333333-3333-4333-8333-333333333333
 seaagent agent capabilities 33333333-3333-4333-8333-333333333333
