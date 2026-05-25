@@ -318,6 +318,7 @@ Rules:
 - `owner_id` defaults to `internal`; gateway returns a UUID `id` and response `version` starting at `v1`.
 - Do not send removed `agent_key` fields for new concise agent registrations. Reject or normalize names like `react_game_generator_agent_013919`; use canonical `name: "react_game_generator_agent"` plus an intentional `owner_id`.
 - `model` and `config` default to `{}`. Agent `metadata` is ignored and stored as `{}`; use `config` for runtime settings.
+- Gateway normalizes `model.default` and `model.allowed` by removing provider or routing prefixes before storage. For example, `vertex_ai/gemini-3-flash-preview`, `openai/gpt-4o`, and `gpt/gpt-4.1-mini` are stored as `gemini-3-flash-preview`, `gpt-4o`, and `gpt-4.1-mini`.
 - `skills` must contain non-empty Skill UUIDs and every referenced skill must resolve to active Skill current state visible to the agent owner. Private Skill refs owned by another production line are rejected.
 - Agent register creates an active agent by default. `enabled` is kept only for payload compatibility.
 - To mark a registered agent as a sandbox agent, add `config.runtime.sandbox`. The presence of `sandbox` is the type marker; do not add `enabled`.
@@ -365,6 +366,8 @@ Use with `agent register` to create if the payload includes low-level trigger fi
 ```
 
 Agent `metadata` is stored as `{}`. Every skill ref must resolve to active Skill current state. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`; an Agent must be `active` to run through chat. `category` must remain `fabric` or `seaactor`.
+
+Gateway normalizes `model_config.default` and `model_config.allowed` by removing provider or routing prefixes before storage. For example, `vertex_ai/gemini-3-flash-preview`, `openai/gpt-4o`, and `gpt/gpt-4.1-mini` are stored as `gemini-3-flash-preview`, `gpt-4o`, and `gpt-4.1-mini`.
 
 Use the low-level update shape to fix runnable-agent issues after registration. If a no-tool chat smoke test returns a proxy timeout, first verify/update `category: "fabric"` and a known-good `model_config` before investigating tool behavior.
 

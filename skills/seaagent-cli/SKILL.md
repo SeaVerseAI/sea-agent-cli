@@ -1,7 +1,7 @@
 ---
 name: seaagent-cli
 description: "Use this skill when working with the local seaagent CLI for SeaArt agent-gateway: configuring endpoints and API keys, registering/updating/deleting tools, skills, and agents, listing catalog entries, resolving runtime configs, and running or inspecting chats."
-version: "2026.05.20"
+version: "2026.05.25"
 ---
 
 # Seaagent CLI
@@ -364,6 +364,7 @@ Tool and Skill use one exposed create endpoint, `/register`, but the gateway han
 - Skill and Agent metadata are reserved by gateway and stored as `{}`; put Skill runtime config in `manifest`, and Agent runtime config in `config`/`agent_config`.
 - Agent register shape: no `model_config` or `agent_config`; the gateway parses `AgentRegisterRequest`.
 - Agent low-level shape: includes `model_config` or `agent_config`; the gateway parses `AgentCreateRequest` and returns a UUID `id`.
+- Agent model names are normalized on create/update: in `model.default`, `model.allowed`, `model_config.default`, and `model_config.allowed`, provider or routing prefixes such as `vertex_ai/`, `openai/`, or `gpt/` are removed and only the model name after the slash is stored.
 
 Update endpoints have similar Tool/Skill switching:
 
