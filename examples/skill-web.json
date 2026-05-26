@@ -1,5 +1,5 @@
 {
-  "name": "web_skill",
+  "name": "web-skill",
   "description": "Fetch and process web pages.",
   "provider": "web-tools-mcp",
   "required_tools": ["22222222-2222-4222-8222-222222222222"],

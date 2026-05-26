@@ -9,8 +9,9 @@
     "system_prompt": "You are a concise web assistant.",
     "skill_instructions": [
       {
-        "id": "inline_web_skill:v1",
-        "name": "inline_web_skill",
+        "id": "inline-web-skill:v1",
+        "name": "inline-web-skill",
+        "description": "Use web tools when web content is needed.",
         "instruction": "Use the provided tools when web content is needed."
       }
     ],

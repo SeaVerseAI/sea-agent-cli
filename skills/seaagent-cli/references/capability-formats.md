@@ -245,6 +245,19 @@ Also usable with `skill update <id> -f file` if the payload does not include low
 Rules:
 
 - `name`, `description`, and `instruction` are required.
+- Skill `name` must match `^[a-z0-9-]+$`: lowercase letters, digits, and hyphens only. Do not use underscores, spaces, or uppercase letters. This `name` becomes the runtime inline Skill frontmatter `name` and must also be valid as `<name>/SKILL.md`.
+- `description` must be a short one-line routing summary. It becomes the runtime inline Skill frontmatter `description`; the model uses it to decide whether to load the full Skill body.
+- `instruction` is the full markdown Skill body. During registered-Agent chat, gateway assembles each resolved Skill into an inline `SKILL.md` document:
+  ```md
+  ---
+  name: image-edit
+  description: Prepares image modification requests by calling generate_task_tool.
+  ---
+
+  # Image Editing Specialist
+
+  Detailed operating instructions...
+  ```
 - `provider` defaults to `internal`; gateway returns a UUID `id`.
 - The gateway may normalize `provider` to an internal provider UUID; use the returned provider value for later `--provider` filters.
 - The gateway builds current `skills.manifest` only from `instruction`, `config`, `required_tools`, and `optional_tools`.
@@ -281,7 +294,7 @@ Use with `skill register` to create if the payload includes low-level trigger fi
 }
 ```
 
-Create and update use outer Skill fields for identity and display. `manifest.instruction` must be non-empty. Skill metadata is stored as `{}`. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`.
+Create and update use outer Skill fields for identity and display. `name` must match `^[a-z0-9-]+$`; `description` and `manifest.instruction` must be non-empty. Registered-Agent chat turns the outer `name` and `description` into inline `SKILL.md` frontmatter, then writes `manifest.instruction` as the markdown body after a blank line. Skill metadata is stored as `{}`. Low-level `status` accepts `draft`, `active`, `deprecated`, `disabled`, or `deleted`.
 
 ## Agent Concise Register
 
