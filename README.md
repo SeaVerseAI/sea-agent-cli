@@ -4,6 +4,14 @@ npm CLI for `agent-gateway`.
 
 ## Install
 
+From GitHub:
+
+```bash
+npm install -g git+https://github.com/SeaVerseAI/sea-agent-cli.git
+```
+
+For local development:
+
 ```bash
 npm install
 npm run build
