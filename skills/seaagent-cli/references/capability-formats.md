@@ -129,6 +129,7 @@ Also usable with `tool update <id> -f file` if the payload does not include low-
   "runtime_type": "http",
   "description": "What the tool does.",
   "endpoint": "https://tool.example.com/invoke",
+  "service_name": "tool",
   "method": "POST",
   "response_mode": "json",
   "poll_field": "task_id",
@@ -153,6 +154,8 @@ Rules:
 - `provider` defaults to `internal`; the gateway assigns response `version` starting at `v1`.
 - The gateway may normalize `provider` to an internal provider UUID; use the returned provider value for later `--provider` filters.
 - `runtime_type` defaults to `http` when `endpoint` is present, otherwise to `builtin`; `method` defaults to `POST` and is forwarded to Agent Worker.
+- `service_name` identifies the backing service for the Tool. For remote HTTP tools, use the endpoint host's service prefix, for example `http://agentctl-service.us-west1.infra.seaart.dev/tools/bootstrap_from_tool` uses `agentctl-service`; tools on the same service should share one `service_name`. If omitted, gateway derives it from the endpoint host. Builtin and no-endpoint tools default to `deepagent`.
+- `inject_user_credentials` defaults to `false` and is gateway-managed; do not include it in user-facing register/update payloads.
 - Timeout defaults to `10000` ms. Concise input still accepts `config.timeout_ms` or `config.timeout` for compatibility, converts it to the outer `timeout_ms`, and removes it from stored metadata.
 - `response_mode` defaults to `json`; allowed values are `json` and `sse`.
 - `poll_interval` and `poll_timeout` are seconds. Use positive values only; omit polling fields for synchronous tools and non-HTTP tools.
@@ -206,7 +209,8 @@ Use with `tool register` to create if the payload includes low-level trigger fie
   "public": false,
   "status": "active",
   "metadata": {
-    "endpoint": "https://tool.example.com/invoke"
+    "endpoint": "https://tool.example.com/invoke",
+    "service_name": "tool"
   }
 }
 ```

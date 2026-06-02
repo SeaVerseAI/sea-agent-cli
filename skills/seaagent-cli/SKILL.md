@@ -135,7 +135,7 @@ seaagent tool update <tool-id> -f <payload.json|yaml>
 seaagent tool resolve <tool-id>
 ```
 
-Use `tool resolve` before referencing a tool from a skill; it shows the normalized execution metadata that Agent Worker will receive. Register/update payloads should describe runtime behavior, not server-side display metadata. Keep `description` focused on the OpenAI function behavior until gateway stops storing display descriptions.
+Use `tool resolve` before referencing a tool from a skill; it shows the normalized execution metadata that Agent Worker will receive. Register/update payloads should describe runtime behavior, not server-side display metadata. HTTP tools may provide `service_name`; if omitted, gateway derives it from the endpoint host. Do not provide `inject_user_credentials`; gateway defaults it to `false` and manages the field.
 
 Skills:
 
