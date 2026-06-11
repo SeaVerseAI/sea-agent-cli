@@ -12,7 +12,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "tsc && node scripts/write-build-info.mjs",
+    "build": "node scripts/ensure-build-deps.mjs && tsc && node scripts/write-build-info.mjs",
     "prepare": "npm run build",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js"
