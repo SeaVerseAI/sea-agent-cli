@@ -31,6 +31,14 @@ type CliBuildInfo = {
   builtAt?: string;
 };
 
+type CommandResult = {
+  output: string;
+};
+
+type CommandFailure = Error & {
+  output?: string;
+};
+
 type RemoteCommit = {
   sha: string;
   htmlURL?: string;
@@ -136,11 +144,21 @@ export async function updateCliPackage(): Promise<CliUpdateResult> {
   const installSpec = buildInfo.installSpec || DEFAULT_INSTALL_SPEC;
   const command = npmCommand();
   const args = ["install", "-g", installSpec];
-  await runCommand(command, args);
+  let finalArgs = args;
+  try {
+    await runCommand(command, args);
+  } catch (error) {
+    if (!isSeaagentBinExistsError(error)) {
+      throw error;
+    }
+    finalArgs = ["install", "-g", "--force", installSpec];
+    process.stderr.write("[update] Existing seaagent binary detected; retrying npm install with --force.\n");
+    await runCommand(command, finalArgs);
+  }
   return {
     updated: true,
     installSpec,
-    command: `${command} ${args.join(" ")}`,
+    command: `${command} ${finalArgs.join(" ")}`,
   };
 }
 
@@ -213,21 +231,47 @@ async function readCliBuildInfo(): Promise<CliBuildInfo> {
   }
 }
 
-function runCommand(command: string, args: string[]): Promise<void> {
+function runCommand(command: string, args: string[]): Promise<CommandResult> {
   return new Promise((resolvePromise, reject) => {
+    let output = "";
     const child = spawn(command, args, {
-      stdio: "inherit",
+      stdio: ["inherit", "pipe", "pipe"],
+    });
+    child.stdout?.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+      process.stdout.write(chunk);
+    });
+    child.stderr?.on("data", (chunk: Buffer) => {
+      output += chunk.toString("utf8");
+      process.stderr.write(chunk);
     });
     child.on("error", reject);
     child.on("close", (code, signal) => {
       if (code === 0) {
-        resolvePromise();
+        resolvePromise({ output });
         return;
       }
       const reason = signal ? `signal ${signal}` : `exit code ${code ?? "unknown"}`;
-      reject(new Error(`${command} ${args.join(" ")} failed with ${reason}`));
+      const error = new Error(`${command} ${args.join(" ")} failed with ${reason}`) as CommandFailure;
+      error.output = output;
+      reject(error);
     });
   });
+}
+
+function isSeaagentBinExistsError(error: unknown): boolean {
+  const output = commandFailureOutput(error);
+  return /\bEEXIST\b/.test(output)
+    && /\/seaagent\b/.test(output)
+    && /file already exists/i.test(output);
+}
+
+function commandFailureOutput(error: unknown): string {
+  if (!error || typeof error !== "object") {
+    return "";
+  }
+  const failure = error as CommandFailure;
+  return `${failure.message}\n${failure.output ?? ""}`;
 }
 
 function npmCommand(): string {
