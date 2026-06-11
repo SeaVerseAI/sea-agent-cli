@@ -23,7 +23,7 @@ Examples:
     });
     cmd
         .command("update")
-        .description("Update this CLI with npm install -g from GitHub")
+        .description("Update this CLI from GitHub after verifying the package")
         .action(async () => {
         const status = await getCliUpdateStatus();
         if (status.status === "up-to-date") {
@@ -36,7 +36,7 @@ Examples:
             });
             return;
         }
-        process.stderr.write(`Running: npm install -g ${status.installSpec}\n`);
+        process.stderr.write(`Running verified update from ${status.installSpec}\n`);
         printJSON(await updateCliPackage());
     });
     cmd

@@ -1,6 +1,6 @@
 import { spawn } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { homedir } from "node:os";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { request } from "undici";
@@ -84,24 +84,32 @@ export async function updateCliPackage() {
     const buildInfo = await readCliBuildInfo();
     const installSpec = buildInfo.installSpec || DEFAULT_INSTALL_SPEC;
     const command = npmCommand();
-    const args = ["install", "-g", installSpec];
-    let finalArgs = args;
+    const tempRoot = await mkdtemp(join(tmpdir(), "seaagent-update-"));
+    const packDir = join(tempRoot, "pack");
+    const verifyPrefix = join(tempRoot, "verify");
     try {
-        await runCommand(command, args);
-    }
-    catch (error) {
-        if (!isSeaagentBinExistsError(error)) {
-            throw error;
-        }
-        finalArgs = ["install", "-g", "--force", installSpec];
-        process.stderr.write("[update] Existing seaagent binary detected; retrying npm install with --force.\n");
+        await mkdir(packDir, { recursive: true });
+        process.stderr.write(`[update] Packing ${installSpec} before changing the current install.\n`);
+        await runCommand(command, ["pack", installSpec, "--pack-destination", packDir]);
+        const packageFile = await findPackedTarball(packDir);
+        process.stderr.write("[update] Verifying the package in a temporary npm prefix.\n");
+        const verifyArgs = ["install", "-g", "--prefix", verifyPrefix, packageFile];
+        await runCommand(command, verifyArgs);
+        await runCommand(seaagentBinPath(verifyPrefix), ["--version"], { echoOutput: false });
+        const finalArgs = ["install", "-g", "--force", packageFile];
+        process.stderr.write("[update] Installing the verified package globally.\n");
         await runCommand(command, finalArgs);
+        return {
+            updated: true,
+            installSpec,
+            command: `${command} ${finalArgs.join(" ")}`,
+            packageFile,
+            verifiedCommand: `${command} ${verifyArgs.join(" ")}`,
+        };
     }
-    return {
-        updated: true,
-        installSpec,
-        command: `${command} ${finalArgs.join(" ")}`,
-    };
+    finally {
+        await rm(tempRoot, { recursive: true, force: true });
+    }
 }
 function cliUpdateMessage(status) {
     const local = status.localCommit ? shortCommit(status.localCommit) : "unknown";
@@ -170,19 +178,24 @@ async function readCliBuildInfo() {
         return {};
     }
 }
-function runCommand(command, args) {
+function runCommand(command, args, options = {}) {
     return new Promise((resolvePromise, reject) => {
         let output = "";
+        const echoOutput = options.echoOutput ?? true;
         const child = spawn(command, args, {
             stdio: ["inherit", "pipe", "pipe"],
         });
         child.stdout?.on("data", (chunk) => {
             output += chunk.toString("utf8");
-            process.stdout.write(chunk);
+            if (echoOutput) {
+                process.stdout.write(chunk);
+            }
         });
         child.stderr?.on("data", (chunk) => {
             output += chunk.toString("utf8");
-            process.stderr.write(chunk);
+            if (echoOutput) {
+                process.stderr.write(chunk);
+            }
         });
         child.on("error", reject);
         child.on("close", (code, signal) => {
@@ -197,21 +210,21 @@ function runCommand(command, args) {
         });
     });
 }
-function isSeaagentBinExistsError(error) {
-    const output = commandFailureOutput(error);
-    return /\bEEXIST\b/.test(output)
-        && /\/seaagent\b/.test(output)
-        && /file already exists/i.test(output);
-}
-function commandFailureOutput(error) {
-    if (!error || typeof error !== "object") {
-        return "";
+async function findPackedTarball(packDir) {
+    const entries = await readdir(packDir);
+    const tarballs = entries.filter((entry) => entry.endsWith(".tgz"));
+    if (tarballs.length !== 1) {
+        throw new Error(`Expected one packed seaagent tarball in ${packDir}, found ${tarballs.length}`);
     }
-    const failure = error;
-    return `${failure.message}\n${failure.output ?? ""}`;
+    return join(packDir, tarballs[0]);
 }
 function npmCommand() {
     return process.platform === "win32" ? "npm.cmd" : "npm";
+}
+function seaagentBinPath(prefix) {
+    return process.platform === "win32"
+        ? join(prefix, "seaagent.cmd")
+        : join(prefix, "bin", "seaagent");
 }
 function shouldSkipAutoCheck(argv) {
     if (argv.some((arg) => arg === "--help" || arg === "-h" || arg === "--version" || arg === "-V")) {
