@@ -1,9 +1,9 @@
 {
   "name": "@seaart/sea-agent-cli",
   "version": "0.1.0",
-  "gitCommit": "62006f25c7da4bd631f0a5d606fb4e51c2046f52",
-  "githubRepo": "SeaVerseAI/sea-agent-cli",
+  "gitCommit": "21feada87cb0d389e4108ddb95dbecd3ccdd73f7",
+  "githubRepo": "SeaArt-Infra/sea-agent-cli",
   "githubBranch": "main",
-  "installSpec": "git+https://github.com/SeaVerseAI/sea-agent-cli.git",
-  "builtAt": "2026-06-11T08:53:58.703Z"
+  "installSpec": "git+https://github.com/SeaArt-Infra/sea-agent-cli.git",
+  "builtAt": "2026-06-16T13:10:09.227Z"
 }

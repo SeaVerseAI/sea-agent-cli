@@ -9,9 +9,9 @@ const CLI_CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const CLI_CHECK_TIMEOUT_MS = 2_000;
 const DEFAULT_NAME = "@seaart/sea-agent-cli";
 const DEFAULT_VERSION = "0.1.0";
-const DEFAULT_GITHUB_REPO = "SeaVerseAI/sea-agent-cli";
+const DEFAULT_GITHUB_REPO = "SeaArt-Infra/sea-agent-cli";
 const DEFAULT_GITHUB_BRANCH = "main";
-const DEFAULT_INSTALL_SPEC = "git+https://github.com/SeaVerseAI/sea-agent-cli.git";
+const DEFAULT_INSTALL_SPEC = "git+https://github.com/SeaArt-Infra/sea-agent-cli.git";
 
 type CliUpdateCheckCache = {
   lastCheckedAt?: string;

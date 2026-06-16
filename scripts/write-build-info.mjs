@@ -22,9 +22,9 @@ const buildInfo = {
   name: packageJSON.name,
   version: packageJSON.version,
   gitCommit: process.env.npm_package_gitHead || git(["rev-parse", "HEAD"]),
-  githubRepo: "SeaVerseAI/sea-agent-cli",
+  githubRepo: "SeaArt-Infra/sea-agent-cli",
   githubBranch: "main",
-  installSpec: "git+https://github.com/SeaVerseAI/sea-agent-cli.git",
+  installSpec: "git+https://github.com/SeaArt-Infra/sea-agent-cli.git",
   builtAt: new Date().toISOString(),
 };
 
